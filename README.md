@@ -24,4 +24,4 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
 
 Thanks for reading. Hopefully this project will prove useful to someone other than myself. 
 
-Final Note - This is very much a work in progress. If you find a bug (of which there are probably many), please let me know.
+Final Note - This is very much a work in progress. If you find a bug (of which there are probably many), please let me know.d
