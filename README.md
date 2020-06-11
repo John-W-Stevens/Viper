@@ -34,7 +34,7 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
     specifiying the use of sdk 2.2.107 (which is necessary if you have multiple versions of .NET like I do).
 - Viper will automatically add SchemaId key fields and CreatedAt/UpdatedAt fields to each model created
 
-### Use it repeatedly
+### Use it Repeatedly:
 Rather than manually bringing viper.py into every project I start I put viper.py in my root directory and call it with a terminal command. In order to do this, I added the following function to my ./zshrc file":
     viper(){
 	    cp ~/viper.py ./
