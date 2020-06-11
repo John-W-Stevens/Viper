@@ -702,6 +702,31 @@ def add_login_and_registration(project_name, context_name):
             new_file_contents += line + "\n"
         os.system(f"cat > ./{project_name}/Controllers/HomeController.cs << EOF\n{new_file_contents}")
 
+    def build_success():
+        lines =  [
+        "@{",
+        "    ViewData[\"Title\"] = \"Success\";",
+        "}",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 text-right\">",
+        "        <a href=\"/logout\">Logout</a>",
+        "    </div>",
+        "</div>",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 text-center\">",
+        "        <h1 class=\"text-success\">Success</h1>",
+        "    </div>",
+        "</div>",
+        "",
+        ]
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+
+        os.system(f"cat > ./{project_name}/Views/Home/Success.cshtml << EOF\n{new_file_contents}")
+
     def customize_css(project_name):
         lines = [
         ".error-message{",
@@ -721,6 +746,17 @@ def add_login_and_registration(project_name, context_name):
     build_login_and_registration_index()
     build_controller_with_login_and_registration(project_name, context_name)
     customize_css(project_name)
+    build_success()
+
+
+def make_migrations(project_name):
+    
+    migration_name = input("What is this migration called (i.e., 'FirstMigration'): ")
+    
+    os.chdir(f"{pathlib.Path(__file__).parent.absolute()}/{project_name}")
+    os.system(f"dotnet ef migrations add {migration_name}")
+    os.system(f"dotnet ef database update")
+
 
 def viper():
     print("Welcome to Viper. Let's build a project.")
@@ -760,6 +796,11 @@ def viper():
     os.system(f"git -C {project_name} init") # run git init
     appsettings_json(project_name, MySql_Database, MySql_Username, MySql_Password) # add appsettings.json with DBInfo
     gitignore(project_name) # Add .gitignore
+
+    # migrations
+    wants_to_make_migrations = input("Y/n - Would you like to make migrations? (Not recommended if you want to customize your models further. ")
+    if wants_to_make_migrations in ["y","Y","yes","YES","Yes"]:
+        make_migrations(project_name)
 
     path = f"{pathlib.Path(__file__).parent.absolute()}/{project_name}"
     os.system(f"dotnet watch -p {path} run")
