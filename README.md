@@ -36,11 +36,13 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
 
 ### Use it Repeatedly:
 Rather than manually bringing viper.py into every project I start I put viper.py in my root directory and call it with a terminal command. In order to do this, I added the following function to my ./zshrc file":
-    viper(){
-	    cp ~/viper.py ./
-	    python3 viper.py
-	    rm -rf viper.py
-    }
+```
+viper(){
+    cp ~/viper.py ./
+    python3 viper.py
+    rm -rf viper.py
+}
+```
 Now this program is accessbily with the terminal command: viper
 
 Thanks for reading. Hopefully this project will prove useful to someone other than myself. 
