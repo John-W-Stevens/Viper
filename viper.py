@@ -801,8 +801,9 @@ def viper():
     wants_to_make_migrations = input("Y/n - Would you like to make migrations? (Not recommended if you want to customize your models further. ")
     if wants_to_make_migrations in ["y","Y","yes","YES","Yes"]:
         make_migrations(project_name)
-
-    path = f"{pathlib.Path(__file__).parent.absolute()}/{project_name}"
+        path = f"{pathlib.Path(__file__).parent.absolute()}" 
+    else:
+        path = f"{pathlib.Path(__file__).parent.absolute()}/{project_name}"
     os.system(f"dotnet watch -p {path} run")
 
     return True
