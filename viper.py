@@ -378,6 +378,350 @@ def build_index(project_name):
         new_file_contents += line + "\n"
     os.system(f"cat > ./{project_name}/Views/Home/Index.cshtml << EOF\n{new_file_contents}")
 
+def add_login_and_registration(project_name, context_name):
+    def build_user_class(project_name):
+        lines = [
+        "using System;",
+        "using System.ComponentModel.DataAnnotations;",
+        "using System.ComponentModel.DataAnnotations.Schema;",
+        "",
+        f"namespace {project_name}.Models",
+        "{",
+        "    public class User",
+        "    {",
+        "        [Key]",
+        "        public int UserId { get; set; }",
+        "",
+        "        [Required]",
+        "        [Display(Name = \"First Name\")]",
+        "        public string FirstName { get; set; }",
+        "",
+        "        [Required]",
+        "        [Display(Name = \"Last Name\")]",
+        "        public string LastName { get; set; }",
+        "",
+        "        [EmailAddress]",
+        "        [Required]",
+        "        public string Email { get; set; }",
+        "",
+        "        [DataType(DataType.Password)]",
+        "        [Required]",
+        "        [MinLength(8, ErrorMessage = \"Password must be 8 characters or longer!\")]",
+        "        public string Password { get; set; }",
+        "",
+        "        public DateTime CreatedAt { get; set; } = DateTime.Now;",
+        "",
+        "        public DateTime UpdatedAt { get; set; } = DateTime.Now;",
+        "",
+        "        // Will not be mapped to your users table!",
+        "        [NotMapped]",
+        "        [Compare(\"Password\")]",
+        "        [DataType(DataType.Password)]",
+        "        public string Confirm { get; set; }",
+        "    }",
+        "}",
+        "",
+        ]
+
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+        os.system(f"cat > ./{project_name}/Models/User.cs << EOF\n{new_file_contents}")
+
+    def build_login_user_class(project_name):
+        lines = [
+        "using System;",
+        "using System.ComponentModel.DataAnnotations;",
+        "",
+        f"namespace {project_name}.Models",
+        "{",
+        "    public class LoginUser",
+        "    {",
+        "        [Required]",
+        "        [EmailAddress]",
+        "        [Display(Name = \"Email\")]",
+        "        public string LoginEmail { get; set; }",
+        "",
+        "        [Required]",
+        "        [DataType(DataType.Password)]",
+        "        [Display(Name = \"Password\")]",
+        "        public string LoginPassword { get; set; }",
+        "    }",
+        "}",
+        "",
+        ]
+
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+        os.system(f"cat > ./{project_name}/Models/LoginUser.cs << EOF\n{new_file_contents}")
+
+    def build_registration_partial():
+        lines = [
+        "",
+        "@model User",
+        "",
+        "<form asp-action=\"Create\" method=\"post\">",
+        "    <div class=\"form-group\">",
+        "        <label asp-for=\"FirstName\"></label>&nbsp<span asp-validation-for=\"FirstName\" class=\"error-message\"></span>",
+        "        <input asp-for=\"FirstName\" class=\"form-control\"/>",
+        "    </div>",
+        "    <div class=\"form-group\">",
+        "        <label asp-for=\"LastName\"></label>&nbsp<span asp-validation-for=\"LastName\" class=\"error-message\"></span>",
+        "        <input asp-for=\"LastName\" class=\"form-control\"/>",
+        "    </div>",
+        "    <div class=\"form-group\">",
+        "        <label asp-for=\"Email\"></label>&nbsp<span asp-validation-for=\"Email\" class=\"error-message\"></span>",
+        "        <input asp-for=\"Email\" class=\"form-control\"/>",
+        "    </div>",
+        "    <div class=\"form-group\">",
+        "        <label asp-for=\"Password\"></label>&nbsp<span asp-validation-for=\"Password\" class=\"error-message\"></span>",
+        "        <input asp-for=\"Password\" class=\"form-control\"/>",
+        "    </div>",
+        "    <div class=\"form-group\">",
+        "        <label asp-for=\"Confirm\"></label>&nbsp<span asp-validation-for=\"Confirm\" class=\"error-message\"></span>",
+        "        <input asp-for=\"Confirm\" class=\"form-control\"/>",
+        "    </div>",
+        "    <div class=\"form-group text-left\">",
+        "        <button class=\"btn btn-primary\">Register</button>",
+        "    </div>",
+        "",
+        "</form>",
+        ]
+
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+        os.system(f"cat > ./{project_name}/Views/Home/RegistrationPartial.cshtml << EOF\n{new_file_contents}")
+
+    def build_login_partial():
+        lines = [
+        "",
+        "@model LoginUser",
+        "",
+        "<form asp-action=\"Login\" method=\"post\">",
+        "",
+        "    <div class=\"form-group\">",
+        "        <label asp-for=\"LoginEmail\"></label>&nbsp<span asp-validation-for=\"LoginEmail\" class=\"error-message\"></span>",
+        "        <input asp-for=\"LoginEmail\" class=\"form-control\" />",
+        "    </div>",
+        "",
+        "    <div class=\"form-group\">",
+        "        <label asp-for=\"LoginPassword\"></label>&nbsp<span asp-validation-for=\"LoginPassword\" class=\"error-message\"></span>",
+        "        <input asp-for=\"LoginPassword\" class=\"form-control\" />",
+        "    </div>",
+        "    <div class=\"form-group text-right\">",
+        "        <button class=\"btn btn-success\">Login</button>",
+        "    </div>",
+        "",
+        "</form>",
+        ]
+
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+        os.system(f"cat > ./{project_name}/Views/Home/LoginPartial.cshtml << EOF\n{new_file_contents}")
+
+    def build_login_and_registration_index():
+        lines = [
+        "@{",
+        "    ViewData[\"Title\"] = \"Home Page\";",
+        "}",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 text-center\">",
+        "        <h1>Launched With Viper CLI</h1>",
+        "        <h4>Login and Registration Partials</h4>",
+        "    </div>",
+        "</div>",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 col-md-6\">",
+        "        <partial name=\"RegistrationPartial\"></partial>",
+        "    </div>",
+        "    <div class=\"col-12 col-md-6\">",
+        "        <partial name=\"LoginPartial\"></partial>",
+        "    </div>",
+        "</div>",
+        ]
+
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+        os.system(f"cat > ./{project_name}/Views/Home/Index.cshtml << EOF\n{new_file_contents}")
+
+    def build_controller_with_login_and_registration(project_name, context_name):
+
+        lines = [
+        "using System;",
+        "using System.Collections.Generic;",
+        "using System.Diagnostics;",
+        "using System.Linq;",
+        "using System.Threading.Tasks;",
+        "using Microsoft.AspNetCore.Mvc;",
+        "using Microsoft.EntityFrameworkCore;",
+        "using Microsoft.AspNetCore.Http; // for session",
+        "using Microsoft.AspNetCore.Identity; // for password hashing", 
+        f"using {project_name}.Models;",
+        "",
+        f"namespace {project_name}.Controllers",
+        "{",
+        "    public class HomeController : Controller",
+        "    {",
+        "",
+        f"        private {context_name} dbContext;",
+        "",
+        f"        public HomeController({context_name} context)",
+        "        {",
+        "            dbContext = context;",
+        "        }",
+        "",
+        "        // ROUTE:               METHOD:                VIEW:",
+        "        // -----------------------------------------------------------------------------------",
+        "        // GET(\"\")              Index()                Index.cshtml",
+        "        // POST(\"/register\")    Create(User user)      ------ (Index.cshtml to display errors)",
+        "        // POST(\"/login\")       Login(LoginUser user)  ------ (Index.cshtml to display errors)",
+        "        // GET(\"/logout\")       Logout()               ------",
+        "        // GET(\"/success\")      Success()              Success.cshtml",
+        "",
+        "        [HttpGet(\"\")]",
+        "        public IActionResult Index()",
+        "        {",
+        "            //List<User> AllUsers = dbContext.Users.ToList();",
+        "            return View();",
+        "        }",
+        "",
+        "        [HttpPost(\"/register\")]",
+        "        public IActionResult Create(User user)",
+        "        {",
+        "            if (ModelState.IsValid)",
+        "            {",
+        "                // If a User exists with provided email",
+        "                if (dbContext.Users.Any(u => u.Email == user.Email))",
+        "                {",
+        "                    // Manually add a ModelState error to the Email field",
+        "                    ModelState.AddModelError(\"Email\", \"Email already in use!\");",
+        "                    return View(\"Index\");",
+        "                }",
+        "",
+        "                // hash password",
+        "                PasswordHasher<User> Hasher = new PasswordHasher<User>();",
+        "                user.Password = Hasher.HashPassword(user, user.Password);",
+        "",
+        "                // create user",
+        "                dbContext.Add(user);",
+        "                dbContext.SaveChanges();",
+        "",
+        "                // sign user into session",
+        "                var NewUser = dbContext.Users.FirstOrDefault(u => u.Email == user.Email);",
+        "                int UserId = NewUser.UserId;",
+        "                HttpContext.Session.SetInt32(\"UserId\", UserId);",
+        "",
+        "                // go to success",
+        "                return RedirectToAction(\"Success\");",
+        "            }",
+        "            // display errors",
+        "            else",
+        "            {",
+        "                return View(\"Index\");",
+        "            }",
+        "        }",
+        "",
+        "        [HttpPost(\"/login\")]",
+        "        public IActionResult Login(LoginUser user)",
+        "        {",
+        "            if (ModelState.IsValid)",
+        "            {",
+        "                var userInDb = dbContext.Users.FirstOrDefault(u => u.Email == user.LoginEmail);",
+        "                if (userInDb == null)",
+        "                {",
+        "                    // Add an error to ModelState and return to View!",
+        "                    ModelState.AddModelError(\"LoginEmail\", \"Invalid Email/Password\");",
+        "                    return View(\"Index\");",
+        "                }",
+        "                // Initialize hasher object",
+        "                var hasher = new PasswordHasher<LoginUser>();",
+        "",
+        "                // verify provided password against hash stored in db",
+        "                var result = hasher.VerifyHashedPassword(user, userInDb.Password, user.LoginPassword);",
+        "                if (result == 0)",
+        "                {",
+        "                    // handle failure (this should be similar to how \"existing email\" is handled)",
+        "                    ModelState.AddModelError(\"LoginPassword\", \"Password is invalid.\");",
+        "                    return View(\"Index\");",
+        "                }",
+        "",
+        "                // sign user into session",
+        "                int UserId = userInDb.UserId;",
+        "                HttpContext.Session.SetInt32(\"UserId\", UserId);",
+        "",
+        "                return RedirectToAction(\"Success\");",
+        "            }",
+        "            // display errors",
+        "            else",
+        "            {",
+        "                return View(\"Index\");",
+        "            }",
+        "        }",
+        "",
+        "        [HttpGet(\"/logout\")]",
+        "        public IActionResult Logout()",
+        "        {",
+        "            HttpContext.Session.Clear();",
+        "            return RedirectToAction(\"Index\");",
+        "        }",
+        "",
+        "        [HttpGet(\"success\")]",
+        "        public IActionResult Success()",
+        "        {",
+        "            int? userId = HttpContext.Session.GetInt32(\"UserId\");",
+        "            if (userId == null)",
+        "            {",
+        "                return RedirectToAction(\"Index\");",
+        "            }",
+        "            return View();",
+        "        }",
+        "",
+        "        public IActionResult Privacy()",
+        "        {",
+        "            return View();",
+        "        }",
+        "",
+        "        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]",
+        "        public IActionResult Error()",
+        "        {",
+        "            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });",
+        "        }",
+        "    }",
+        "}",
+        "",
+        ]
+
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+        os.system(f"cat > ./{project_name}/Controllers/HomeController.cs << EOF\n{new_file_contents}")
+
+    def customize_css(project_name):
+        lines = [
+        ".error-message{",
+        "    font-size: 14px;",
+        "    color: red;",
+        "}",
+        ]
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+        os.system(f"cat >> ./{project_name}/wwwroot/css/site.css << EOF\n{new_file_contents}")
+
+    build_user_class(project_name)
+    build_login_user_class(project_name)
+    build_registration_partial()
+    build_login_partial()
+    build_login_and_registration_index()
+    build_controller_with_login_and_registration(project_name, context_name)
+    customize_css(project_name)
+
 def viper():
     print("Welcome to Viper. Let's build a project.")
     project_name = input("Enter project name: ")
@@ -390,14 +734,28 @@ def viper():
     os.system(f"dotnet new mvc --no-https -o {project_name}")
     os.system(f"dotnet add ./{project_name} package Pomelo.EntityFrameworkCore.MySql -v 2.2.0")
 
-    models = build_models(project_name)
-
+    models = []
     context = input("Enter name of context: ")
+    use_login_and_registration = input("Y/n - Would you like to add Login and Registration? ")
+    if use_login_and_registration in ["Y","y","YES","Yes","yes"]:
+        use_login_and_registration = True
+    else:
+        use_login_and_registration = False
+    if use_login_and_registration:
+        models.append( ("User", "Users") )
+        # run login_and_reg codes
+        add_login_and_registration(project_name, context)
+
+    models += build_models(project_name)
+
+    # context = input("Enter name of context: ")
     build_context_file(project_name, context, models)
     build_startup_file(project_name, context)
-    build_controller(project_name, context)
+    if not use_login_and_registration:
+        build_controller(project_name, context)
     build_layout(project_name)
-    build_index(project_name)
+    if not use_login_and_registration:
+        build_index(project_name)
 
     os.system(f"git -C {project_name} init") # run git init
     appsettings_json(project_name, MySql_Database, MySql_Username, MySql_Password) # add appsettings.json with DBInfo

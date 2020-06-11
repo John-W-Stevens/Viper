@@ -7,7 +7,7 @@
     run viper.py in the same directory you wish to start your ASP.NET project
 
 ### What does it do?
-Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web application through the command line. It brings in Entity Framework and facilitates the quick configuration of multiple models/schemas (i.e. you can create new models, add attributes, validations, change the display name, and/or designate which attributes are required.) It removes some of the default features related to cookies. In list form, Viper does the following:
+Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web application through the command line. It brings in Entity Framework and facilitates the quick configuration of multiple models/schemas (i.e. you can create new models, add attributes, validations, change the display name, and/or designate which attributes are required.) The optional login/registration feature will build out a User Model and LoginUser ViewModel, corresponding Registration and Login Partials, and functional Controller methods that handle the creation of new users and authentication of login attempts. It removes some of the default features related to cookies. In list form, Viper does the following:
 
 - Creates a new ASP.NET MVC framework
 - Initializes Git
@@ -16,6 +16,7 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
 - Brings in session as a service in Startup.cs and injects it into Home.Controller
 - Sets up Startup.cs (Brings in entity framework, removes cookies, adds Session)
 - Creates multiple models/schemas with customizable fields (add properties/attributes, validations, configure display name)
+- Provides an optional ready-made login and registration feature:
 - Launches project with dotnet watch run
 
 ### Important Notes:
