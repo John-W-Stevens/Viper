@@ -165,6 +165,7 @@ def build_models(project_name):
         
         lines1 = [
         "using System;",
+        "using System.Collections.Generic;",
         "using System.ComponentModel.DataAnnotations;",
         "",
         f"namespace {project_name}.Models",
