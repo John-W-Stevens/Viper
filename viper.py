@@ -1,6 +1,32 @@
 import os
 import pathlib
 
+def candy():
+    header = [
+        "      _    _ _____  _____  _______  ______      _______        _____",
+        "       \  /    |   |_____] |______ |_____/      |       |        |  ",
+        "        \/   __|__ |       |______ |    \_      |_____  |_____ __|__",
+    ]
+    aspnet = [
+        "            ____ ____ ___   _  _ ____ ___    ____ ____ ____ ____ ",
+        "            |__| [__  |__]  |\ | |___  |     |    |  | |__/ |___ ",
+        "            |  | ___] |    .| \| |___  |     |___ |__| |  \ |___ ",
+    ]
+    header_string = "".join([s + "\n" for s in header])
+    aspnet_string = "".join([s + "\n" for s in aspnet])
+
+    footer = [
+        "_   _ ____ _  _ . ____ ____    ____ _    _       ____ ____ ___",
+        " \_/  |  | |  | ' |__/ |___    |__| |    |       [__  |___  | ",  
+        "  |   |__| |__|   |  \ |___    |  | |___ |___    ___] |___  | ",
+        "       ____ ____ ___    ____ ____ ___ ____ ____    _ ___      ",              
+        "       | __ |___  |     |__| |___  |  |___ |__/    |  |       ",        
+        "       |__] |___  |     |  | |     |  |___ |  \    |  |       ",      
+    ]
+    footer_string = "".join([s + "\n" for s in footer])
+    candies = [header_string,aspnet_string,footer_string]
+    return candies
+
 def appsettings_json(project_name, database, username, password):
     # os.system(f"touch ./{project_name}/appsettings.json")
     os.system(f"cat > ./{project_name}/appsettings.json << EOF\n"
@@ -153,18 +179,26 @@ def build_models(project_name):
         lines2 = []
 
         while True:
-            res = input("Would you like to add an attribute? ")
+            # res = input("Would you like to add an attribute? ")
+            res = input(f'\033[92m{"Would you like to add an attribute? "}\033[00m')
             if is_yes(res):
-                label = input("What is this attribute called? ")
+                # label = input("What is this attribute called? ")
+                label = input(f'\033[92m{"What is this attribute called? "}\033[00m')
                 attributes.append(label)
-                stype = input("What is this attribute's type? ")
-                required = input("Y/n - Is this attribute required? ")
+                # stype = input("What is this attribute's type? ")
+                stype = input(f'\033[92m{"What is this attributes type? "}\033[00m')
+                # required = input("Y/n - Is this attribute required? ")
+                required = input(f'\033[92m{"Y/n - Is this attribute required? "}\033[00m')
                 display = ""
                 while True:
-                    change_display = input("Y/n - Would you like to change the default display? ")
+                    # change_display = input("Y/n - Would you like to change the default display? ")
+                    change_display = input(f'\033[92m{"Y/n - Would you like to change the default display? "}\033[00m')
                     if is_yes(change_display):
-                        d = input("Enter custom display message: ")
-                        r = input(f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? ")
+                        # d = input("Enter custom display message: ")
+                        d = input(f'\033[92m{"Enter custom display message: "}\033[00m')
+                        # r = input(f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? ")
+                        message = f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? "
+                        r = input(f'\033[92m{message}\033[00m')
                         if is_yes(r):
                             display = d
                             break
@@ -173,10 +207,14 @@ def build_models(project_name):
 
                 validations = []
                 while True:
-                    res = input("Y/n - Would you like to add a validation to this attribute? ")
+                    # res = input("Y/n - Would you like to add a validation to this attribute? ")
+                    res = input(f'\033[92m{"Y/n - Would you like to add a validation to this attribute? "}\033[00m')
                     if is_yes(res):
-                        validation = input("Please enter your validation exactly as it would appear in C#. For example: [Range(1,5)] ")
-                        r = input(f"Y/n - You entered: {validation} as your validation. Is this correct? ")
+                        # validation = input("Please enter your validation exactly as it would appear in C#. For example: [Range(1,5)] ")
+                        validation = input(f'\033[92m{"Please enter your validation exactly as it would appear in C#. For example: [Range(1,5)] "}\033[00m')
+                        # r = input(f"Y/n - You entered: {validation} as your validation. Is this correct? ")
+                        message = f"Y/n - You entered: {validation} as your validation. Is this correct? "
+                        r = input(f'\033[92m{message}\033[00m')
                         if is_yes(r):
                             validations.append(validation)
                     else:
@@ -213,8 +251,8 @@ def build_models(project_name):
         os.system(f"touch ./{project_name}/Models/{schema_singular}.cs")
         os.system(f"cat > ./{project_name}/Models/{schema_singular}.cs << EOF\n{new_file_contents}")
 
-
-        wants_crud = input("Y/n - Do you want Viper to build out basic CRUD functionality for this model? ")
+        # wants_crud = input("Y/n - Do you want Viper to build out basic CRUD functionality for this model? ")
+        wants_crud = input(f'\033[92m{"Y/n - Do you want Viper to build out basic CRUD functionality for this model? "}\033[00m')
         
         controller_lines = []
         layout_lines = []
@@ -225,12 +263,17 @@ def build_models(project_name):
         return controller_lines, layout_lines
 
     while True:
-        res = input("Y/n - Would you like to add a model? ")
+        # res = input("Y/n - Would you like to add a model? ")
+        res = input(f'\033[92m{"Y/n - Would you like to add a model? "}\033[00m')
         if is_yes(res):
             while True:
-                schema_singular = input("What is the singular label for this model? (ex. 'User') ")
-                schema_plural = input("What is the plural label for this model? (ex. 'Users') " )
-                res = input(f"Y/n - You selected {schema_singular} and {schema_plural} as the labels for this model. Is this correct? ")
+                # schema_singular = input("What is the singular label for this model? (ex. 'User') ")
+                schema_singular = input(f'\033[92m{"What is the singular label for this model? (ex. User) "}\033[00m')
+                # schema_plural = input("What is the plural label for this model? (ex. 'Users') " )
+                schema_plural = input(f'\033[92m{"What is the plural label for this model? (ex. Users) "}\033[00m')
+                # res = input(f"Y/n - You selected {schema_singular} and {schema_plural} as the labels for this model. Is this correct? ")
+                message = f"Y/n - You selected {schema_singular} and {schema_plural} as the labels for this model. Is this correct? "
+                res = input(f'\033[92m{message}\033[00m')
                 if is_yes(res):
                     break
             new_controller_lines, new_layout_lines = build_model(project_name, schema_singular, schema_plural)
@@ -1079,29 +1122,47 @@ def add_login_and_registration(project_name, context_name, extra_controller_line
     customize_css(project_name)
     build_success()
 
-def make_migrations(project_name):
-    migration_name = input("What is this migration called (i.e., 'FirstMigration'): ")
+def make_migrations(project_name, message):
+    # migration_name = input("What is this migration called (i.e., 'FirstMigration'): ")
+    migration_name = input(f'\033[92m{"What is this migration called (i.e., FirstMigration): "}\033[00m')
     os.chdir(f"{pathlib.Path(__file__).parent.absolute()}/{project_name}")
     os.system(f"dotnet ef migrations add {migration_name}")
     os.system(f"dotnet ef database update")
+    print()
+    print(f'\033[93m{message}\033[00m')
     path = f"{pathlib.Path(__file__).parent.absolute()}/{project_name}"
     os.system(f"dotnet watch -p {path} run")
 
 def viper():
-    print("Welcome to Viper. Let's build a project.")
-    project_name = input("Enter project name: ")
+    candies = candy()
+    print(f'\033[93m{candies[0]}\033[00m')
+    print(f'\033[93m{candies[1]}\033[00m')
+ 
+    print(f'\033[93m{"                 Welcome to Viper CLI. Lets build a project."}\033[00m')
+    print()
+    # project_name = input("Enter project name: ")
+    project_name = input(f'\033[92m{"Enter project name: "}\033[00m')
 
-    MySql_Database = input("Which MySql Database are you using? ")
-    MySql_Username = input("Enter your MySql username: ")
-    MySql_Password = input("Enter your MySql password: ")
+    # MySql_Database = input("Which MySql Database are you using? ")
+    MySql_Database = input(f'\033[92m{"Which MySql Database are you using? "}\033[00m')
+
+    # MySql_Username = input("Enter your MySql username: ")
+    MySql_Username = input(f'\033[92m{"Enter your MySql username: "}\033[00m')
+
+    # MySql_Password = input("Enter your MySql password: ")
+    MySql_Password = input(f'\033[92m{"Enter your MySql password: "}\033[00m')
 
     global_json() # Create global.json file to specifiy using sdk 2.2.107
     os.system(f"dotnet new mvc --no-https -o {project_name}")
     os.system(f"dotnet add ./{project_name} package Pomelo.EntityFrameworkCore.MySql -v 2.2.0")
 
     models = []
-    context = input("Enter name of context: ")
-    use_login_and_registration = input("Y/n - Would you like to add Login and Registration? ")
+    print()
+    # context = input("Enter name of context: ")
+    context = input(f'\033[92m{"Enter name of context: "}\033[00m')
+
+    # use_login_and_registration = input("Y/n - Would you like to add Login and Registration? ")
+    use_login_and_registration = input(f'\033[92m{"Y/n - Would you like to add Login and Registration? "}\033[00m')
 
     output = build_models(project_name)
     models += output[0]
@@ -1109,7 +1170,6 @@ def viper():
     controller_lines = output[1]
     layout_lines = output[2]
     # models += build_models(project_name)
-
 
     if use_login_and_registration in ["Y","y","YES","Yes","yes"]:
         use_login_and_registration = True
@@ -1135,10 +1195,13 @@ def viper():
     gitignore(project_name) # Add .gitignore
 
     # migrations
-    wants_to_make_migrations = input("Y/n - Would you like to make migrations? (Not recommended if you want to customize your models further. ")
+    # wants_to_make_migrations = input("Y/n - Would you like to make migrations? (Not recommended if you want to customize your models further. ")
+    wants_to_make_migrations = input(f'\033[92m{"Y/n - Would you like to make migrations? (Not recommended if you want to customize your models further. "}\033[00m')
     if wants_to_make_migrations in ["y","Y","yes","YES","Yes"]:
-        make_migrations(project_name)
+        make_migrations(project_name, candies[2])
     else:
+        print()
+        print(f'\033[93m{candies[2]}\033[00m')
         path = f"{pathlib.Path(__file__).parent.absolute()}/{project_name}"
         os.system(f"dotnet watch -p {path} run")
 
