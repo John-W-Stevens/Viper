@@ -231,6 +231,34 @@ def build_models(project_name):
             else:
                 break
 
+        # One-To-Many
+        res = input(f'\033[92m{"Y/n - Is this model part of a one-to-many relationship? "}\033[00m')
+        if is_yes(res):
+            side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
+            # model on the Many side
+            if is_yes(side):
+                while True:
+                    one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
+                    message = f"Y/n - You entered: {one} as the model on the one side of the reltationship. Is this correct? "
+                    res = input(f'\033[92m{message}\033[00m')
+                    if res:
+                        break
+                # model needs foregin key and nav property:
+                lines2.append(f"        public int {one}Id " + "{ get; set; }")
+                lines2.append(f"        public {one} Creator " + "{ get; set; }")
+                lines2.append("")
+            # model on the One side
+            else:
+                while True:
+                    one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
+                    one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
+                    message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the reltationship. Is this correct? "
+                    res = input(f'\033[92m{message}\033[00m')
+                    if res:
+                        break
+                lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
+                lines2.append("")
+
         lines3 = [
         "        [Required]",
         "        public DateTime CreatedAt { get; set; }",
@@ -750,50 +778,87 @@ def CRUD(project_name, schema_s, schema_p, attributes):
     return controller_methods, layout_lines
 
 def add_login_and_registration(project_name, context_name, extra_controller_lines):
+    def is_yes(res):
+        return res in ["y", "Y", "yes", "Yes", "YES"]
+    
     def build_user_class(project_name):
-        lines = [
-        "using System;",
-        "using System.ComponentModel.DataAnnotations;",
-        "using System.ComponentModel.DataAnnotations.Schema;",
-        "",
-        f"namespace {project_name}.Models",
-        "{",
-        "    public class User",
-        "    {",
-        "        [Key]",
-        "        public int UserId { get; set; }",
-        "",
-        "        [Required]",
-        "        [Display(Name = \"First Name\")]",
-        "        public string FirstName { get; set; }",
-        "",
-        "        [Required]",
-        "        [Display(Name = \"Last Name\")]",
-        "        public string LastName { get; set; }",
-        "",
-        "        [EmailAddress]",
-        "        [Required]",
-        "        public string Email { get; set; }",
-        "",
-        "        [DataType(DataType.Password)]",
-        "        [Required]",
-        "        [MinLength(8, ErrorMessage = \"Password must be 8 characters or longer!\")]",
-        "        public string Password { get; set; }",
-        "",
-        "        public DateTime CreatedAt { get; set; } = DateTime.Now;",
-        "",
-        "        public DateTime UpdatedAt { get; set; } = DateTime.Now;",
-        "",
-        "        // Will not be mapped to your users table!",
-        "        [NotMapped]",
-        "        [Compare(\"Password\")]",
-        "        [DataType(DataType.Password)]",
-        "        public string Confirm { get; set; }",
-        "    }",
-        "}",
-        "",
+        lines1 = [
+            "using System;",
+            "using System.Collections.Generic;",
+            "using System.ComponentModel.DataAnnotations;",
+            "using System.ComponentModel.DataAnnotations.Schema;",
+            "",
+            f"namespace {project_name}.Models",
+            "{",
+            "    public class User",
+            "    {",
+            "        [Key]",
+            "        public int UserId { get; set; }",
+            "",
+            "        [Required]",
+            "        [Display(Name = \"First Name\")]",
+            "        public string FirstName { get; set; }",
+            "",
+            "        [Required]",
+            "        [Display(Name = \"Last Name\")]",
+            "        public string LastName { get; set; }",
+            "",
+            "        [EmailAddress]",
+            "        [Required]",
+            "        public string Email { get; set; }",
+            "",
+            "        [DataType(DataType.Password)]",
+            "        [Required]",
+            "        [MinLength(8, ErrorMessage = \"Password must be 8 characters or longer!\")]",
+            "        public string Password { get; set; }",
+            "",
         ]
+        lines2 = []
 
+        # One-To-Many
+        res = input(f'\033[92m{"Y/n - Is the Login/Registration User model part of a one-to-many relationship? "}\033[00m')
+        if is_yes(res):
+            side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
+            # model on the Many side
+            if is_yes(side):
+                while True:
+                    one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
+                    message = f"Y/n - You entered: {one} as the model on the one side of the reltationship. Is this correct? "
+                    res = input(f'\033[92m{message}\033[00m')
+                    if res:
+                        break
+                # model needs foregin key and nav property:
+                lines2.append(f"        public int {one}Id " + "{ get; set; }")
+                lines2.append(f"        public {one} Creator " + "{ get; set }")
+                lines2.append("")
+            # model on the One side
+            else:
+                while True:
+                    one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
+                    one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
+                    message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the reltationship. Is this correct? "
+                    res = input(f'\033[92m{message}\033[00m')
+                    if res:
+                        break
+                lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
+                lines2.append("")
+
+
+        lines3 = [
+            "        public DateTime CreatedAt { get; set; } = DateTime.Now;",
+            "",
+            "        public DateTime UpdatedAt { get; set; } = DateTime.Now;",
+            "",
+            "        // Will not be mapped to your users table!",
+            "        [NotMapped]",
+            "        [Compare(\"Password\")]",
+            "        [DataType(DataType.Password)]",
+            "        public string Confirm { get; set; }",
+            "    }",
+            "}",
+            "",
+        ]
+        lines = lines1 + lines2 + lines3
         new_file_contents = ""
         for line in lines:
             new_file_contents += line + "\n"
@@ -1160,11 +1225,12 @@ def viper():
     # context = input("Enter name of context: ")
     context = input(f'\033[92m{"Enter name of context: "}\033[00m')
 
-    # use_login_and_registration = input("Y/n - Would you like to add Login and Registration? ")
-    use_login_and_registration = input(f'\033[92m{"Y/n - Would you like to add Login and Registration? "}\033[00m')
 
     output = build_models(project_name)
     models += output[0]
+
+    # use_login_and_registration = input("Y/n - Would you like to add Login and Registration? ")
+    use_login_and_registration = input(f'\033[92m{"Y/n - Would you like to add Login and Registration? "}\033[00m')
 
     controller_lines = output[1]
     layout_lines = output[2]
