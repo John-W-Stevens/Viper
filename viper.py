@@ -244,9 +244,28 @@ def build_models(project_name):
                     if res:
                         break
                 # model needs foregin key and nav property:
+                attributes.append(f"{one}Id")
+                display = ""
+                while True:
+                    # change_display = input("Y/n - Would you like to change the default display? ")
+                    change_display = input(f'\033[92m{"Y/n - Would you like to change the default display of the foreign key field? "}\033[00m')
+                    if is_yes(change_display):
+                        # d = input("Enter custom display message: ")
+                        d = input(f'\033[92m{"Enter custom display message: "}\033[00m')
+                        # r = input(f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? ")
+                        message = f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? "
+                        r = input(f'\033[92m{message}\033[00m')
+                        if is_yes(r):
+                            display = d
+                            break
+                    else:
+                        break
+                if display != "":
+                    lines2.append(f'        [Display(Name = "{display}")]')
                 lines2.append(f"        public int {one}Id " + "{ get; set; }")
                 lines2.append(f"        public {one} Creator " + "{ get; set; }")
                 lines2.append("")
+
             # model on the One side
             else:
                 while True:
