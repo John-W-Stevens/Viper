@@ -32,7 +32,7 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
         - Books.cshtml
         - CreateBookForm.cshtml
         - EditBookForm.cshtml
-    - Add fully functional CRUD methods to Home.Controller for each route/razor page
+    - Add fully functional CRUD methods to Home.Controller
     - Add a 'Books' link to the _Layout navbar
 
 - Provides an optional ready-made login and registration feature which has the following elements:
