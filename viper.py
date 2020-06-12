@@ -705,15 +705,15 @@ def CRUD(project_name, schema_s, schema_p, attributes):
         f"            return RedirectToAction(\"{schema_p}\");",
         "        }",
         "",
-        f"        // GET Create-A-{schema_s} Page",
-        f"        [HttpGet(\"create-a-{schema_s.lower()}\")]",
+        f"        // GET {schema_s}/create Page",
+        f"        [HttpGet(\"{schema_s.lower()}/create\")]",
         f"        public IActionResult Create{schema_s}Form()",
         "        {",
         "            return View();",
         "        }",
         "",
         f"        // POST Create One Single {schema_s}",
-        f"        [HttpPost(\"{schema_s.lower()}\")]",
+        f"        [HttpPost(\"{schema_s.lower()}/create\")]",
         f"        public IActionResult Create{schema_s}({schema_s} {schema_s.lower()})",
         "        {",
         "            if (ModelState.IsValid)",
@@ -740,7 +740,7 @@ def CRUD(project_name, schema_s, schema_p, attributes):
 
     schema_s = schema_s.capitalize()
     schema_p = schema_p.capitalize()
-    build_schema_s(project_name, schema_s, schema_p, attributes)
+    # build_schema_s(project_name, schema_s, schema_p, attributes) -> Uncomment this line in order to create this razor page
     build_schema_p(project_name, schema_s, schema_p, attributes)
     build_create_schema_s_form(project_name, schema_s, schema_p, attributes)
     build_edit_schema_s_form(project_name, schema_s, schema_p, attributes)
