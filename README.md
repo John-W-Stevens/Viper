@@ -27,7 +27,7 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
         - HttpPost("/book/create")        -> Submits a Create Book request
         - HttpPost("/book/bookId")        -> Submits a Book Update request
         - HttpPost("/book/bookId/delete") -> Submits a Book Deletion request
-    - Create the following 4x Razor pages in /Home/Views/
+    - Create the following 3x Razor pages in /Home/Views/
         - Books.cshtml
         - CreateBookForm.cshtml
         - EditBookForm.cshtml
