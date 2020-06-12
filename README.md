@@ -21,7 +21,7 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
 - Provides optional ready-made CRUD functionality for each model. If selected, this option will do the following (I use a hypothetical "Book"
   model for this example):
     - Create the following routes (3x GET and 3x POST):
-        - HttpGet("/books")               -> Returns Books.cshtml (Displays all a table of all books in the database)
+        - HttpGet("/books")               -> Returns Books.cshtml (Displays a table of all books in the database)
         - HttpGet("/book/bookId")         -> Returns a Read/Update/Delete page for One Single Book
         - HttpGet("/create-a-book")       -> Returns CreateBookForm.cshtml
         - HttpPost("/book")               -> Submits a Create Book request
