@@ -7,18 +7,34 @@
     run viper.py in the same directory you wish to start your ASP.NET project
 
 ### What does it do?
-Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web application through the command line. It brings in Entity Framework and facilitates the quick configuration of multiple models/schemas (i.e. you can create new models, add attributes, validations, change the display name, and/or designate which attributes are required.) The optional login/registration feature will build out a User Model and LoginUser ViewModel, corresponding Registration and Login Partials, and functional Controller methods that handle the creation of new users and authentication of login attempts. It removes some of the default features related to cookies. In list form, Viper does the following:
+Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web application through the command line. It brings in Entity Framework and facilitates the quick configuration of multiple models/schemas (i.e. you can create new models, add attributes, validations, change the display name, and/or designate which attributes are required.) The optional login/registration feature will build out a User Model and LoginUser ViewModel, corresponding Registration and Login Partials, and functional Controller methods that handle the creation of new users and authentication of login attempts. It also has optional CRUD features for each model (see below). It removes some of the default features related to cookies. In list form, Viper does the following:
 
 - Creates a new ASP.NET MVC no-https web framework
 - Initializes Git
 - Inputs user MySql credentials (database, username, password) in appsettings.json and then puts appsettings.json into .gitignore
 - Brings in session as a service in Startup.cs and injects it into Home.Controller
-- Configures Startup.cs to use Session and Entity Framework
 - Brings in Entity Framework, sets up Context.cs and injects Context class into project Controller
 - Creates multiple models/schemas, based on user input, with customizable fields:
     - add properties/attributes
     - add validations
     - configure display name)
+- Provides optional ready-made CRUD functionality for each model. If selected, this option will do the following (I use a hypothetical "Book"
+  model for this example):
+    - Create the following routes (3x GET and 3x POST):
+        - HttpGet("/books")               -> Returns Books.cshtml (Displays all a table of all books in the database)
+        - HttpGet("/book/bookId")         -> Returns a Read/Update/Delete page for One Single Book
+        - HttpGet("/create-a-book")       -> Returns CreateBookForm.cshtml
+        - HttpPost("/book")               -> Submits a Create Book request
+        - HttpPost("/book/bookId")        -> Submits a Book Update request
+        - HttpPost("/book/bookId/delete") -> Submits a Book Deletion request
+    - Create the following 4x Razor pages in /Home/Views/
+        - Book.cshtml
+        - Books.cshtml
+        - CreateBookForm.cshtml
+        - EditBookForm.cshtml
+    - Add fully functional CRUD methods to Home.Controller for each route/razor page
+    - Add a 'Books' link to the _Layout navbar
+
 - Provides an optional ready-made login and registration feature which has the following elements:
     - User.cs class (which will go into the database)
     - LoginUser.cs class (a viewModel class that won't go into the database)
