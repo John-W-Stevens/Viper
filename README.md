@@ -49,6 +49,7 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
 - Viper is highly specific. It is built for .NET 2.2, not 3.0. This program will create a global.json file in the parent directory
     specifiying the use of sdk 2.2.107 (which is necessary if you have multiple versions of .NET like I do).
 - Viper will automatically add SchemaId key fields and CreatedAt/UpdatedAt fields to each model created
+- Because Viper will create a global.json file, it needs to be run in a "clean" directory (i.e., one that doesn't have a global.json somewhere in its path, like in the parent folder) 
 - I added colors that contrast well with my iterm2 background (which is dark). While readable, it doesn't look nearly as good with a        white background.
 
 ### Use it Repeatedly:

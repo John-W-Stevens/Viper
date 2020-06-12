@@ -1186,17 +1186,17 @@ def add_login_and_registration(project_name, context_name, extra_controller_line
 
         os.system(f"cat > ./{project_name}/Views/Home/Success.cshtml << EOF\n{new_file_contents}")
 
-    def customize_css(project_name):
-        lines = [
-        ".error-message{",
-        "    font-size: 14px;",
-        "    color: red;",
-        "}",
-        ]
-        new_file_contents = ""
-        for line in lines:
-            new_file_contents += line + "\n"
-        os.system(f"cat >> ./{project_name}/wwwroot/css/site.css << EOF\n{new_file_contents}")
+    # def customize_css(project_name):
+    #     lines = [
+    #     ".error-message{",
+    #     "    font-size: 14px;",
+    #     "    color: red;",
+    #     "}",
+    #     ]
+    #     new_file_contents = ""
+    #     for line in lines:
+    #         new_file_contents += line + "\n"
+    #     os.system(f"cat >> ./{project_name}/wwwroot/css/site.css << EOF\n{new_file_contents}")
 
     build_user_class(project_name)
     build_login_user_class(project_name)
@@ -1204,8 +1204,20 @@ def add_login_and_registration(project_name, context_name, extra_controller_line
     build_login_partial()
     build_login_and_registration_index()
     build_controller_with_login_and_registration(project_name, context_name, extra_controller_lines)
-    customize_css(project_name)
+    # customize_css(project_name)
     build_success()
+
+def customize_css(project_name):
+    lines = [
+    ".error-message{",
+    "    font-size: 14px;",
+    "    color: red;",
+    "}",
+    ]
+    new_file_contents = ""
+    for line in lines:
+        new_file_contents += line + "\n"
+    os.system(f"cat >> ./{project_name}/wwwroot/css/site.css << EOF\n{new_file_contents}")
 
 def make_migrations(project_name, message):
     # migration_name = input("What is this migration called (i.e., 'FirstMigration'): ")
@@ -1224,7 +1236,6 @@ def viper():
     candies = candy()
     print(f'\033[93m{candies[0]}\033[00m')
     print(f'\033[93m{candies[1]}\033[00m')
- 
     print(f'\033[93m{"                 Welcome to Viper CLI. Lets build a project."}\033[00m')
     print()
     # project_name = input("Enter project name: ")
@@ -1281,6 +1292,7 @@ def viper():
     os.system(f"git -C {project_name} init") # run git init
     appsettings_json(project_name, MySql_Database, MySql_Username, MySql_Password) # add appsettings.json with DBInfo
     gitignore(project_name) # Add .gitignore
+    customize_css(project_name)
 
     # migrations
     # wants_to_make_migrations = input("Y/n - Would you like to make migrations? (Not recommended if you want to customize your models further. ")
