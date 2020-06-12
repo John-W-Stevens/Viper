@@ -127,12 +127,16 @@ def build_context_file(project_name, context_name, models):
 def build_models(project_name):
 
     models = []
+    controller_lines = []
+    layout_lines = []
 
     def is_yes(res):
         return res in ["y", "Y", "yes", "Yes", "YES"]
 
     def build_model(project_name, schema_singular, schema_plural):
 
+        attributes = []
+        
         lines1 = [
         "using System;",
         "using System.ComponentModel.DataAnnotations;",
@@ -152,6 +156,7 @@ def build_models(project_name):
             res = input("Would you like to add an attribute? ")
             if is_yes(res):
                 label = input("What is this attribute called? ")
+                attributes.append(label)
                 stype = input("What is this attribute's type? ")
                 required = input("Y/n - Is this attribute required? ")
                 display = ""
@@ -208,6 +213,17 @@ def build_models(project_name):
         os.system(f"touch ./{project_name}/Models/{schema_singular}.cs")
         os.system(f"cat > ./{project_name}/Models/{schema_singular}.cs << EOF\n{new_file_contents}")
 
+
+        wants_crud = input("Y/n - Do you want Viper to build out basic CRUD functionality for this model? ")
+        
+        controller_lines = []
+        layout_lines = []
+
+        if is_yes(wants_crud):
+            controller_lines, layout_lines = CRUD(project_name, schema_singular, schema_plural, attributes)
+
+        return controller_lines, layout_lines
+
     while True:
         res = input("Y/n - Would you like to add a model? ")
         if is_yes(res):
@@ -217,15 +233,17 @@ def build_models(project_name):
                 res = input(f"Y/n - You selected {schema_singular} and {schema_plural} as the labels for this model. Is this correct? ")
                 if is_yes(res):
                     break
-            build_model(project_name, schema_singular, schema_plural)
+            new_controller_lines, new_layout_lines = build_model(project_name, schema_singular, schema_plural)
+            controller_lines += new_controller_lines
+            layout_lines += new_layout_lines
             models.append( (schema_singular, schema_plural) )
         else:
             break
-    return models
+    return [models, controller_lines, layout_lines]
 
-def build_controller(project_name, context_name):
+def build_controller(project_name, context_name, extra_lines):
 
-    lines = [
+    lines1 = [
        "using System;",
        "using System.Collections.Generic;",
        "using System.Diagnostics;",
@@ -256,6 +274,8 @@ def build_controller(project_name, context_name):
        "            return View();",
        "        }",
        "",
+    ]
+    lines2 = [
        "        public IActionResult Privacy()",
        "        {",
        "            return View();",
@@ -270,15 +290,15 @@ def build_controller(project_name, context_name):
        "}",
        "",
     ]
-
+    lines = lines1 + extra_lines + lines2
     new_file_contents = ""
     for line in lines:
         new_file_contents += line + "\n"
     os.system(f"cat > ./{project_name}/Controllers/HomeController.cs << EOF\n{new_file_contents}")
 
-def build_layout(project_name):
+def build_layout(project_name, extra_lines):
 
-    lines = [
+    lines1 = [
        "<!DOCTYPE html>",
        "<html>",
        "<head>",
@@ -312,6 +332,9 @@ def build_layout(project_name):
        "                        <li class=\"nav-item\">",
        "                            <a class=\"nav-link text-dark\" asp-area=\"\" asp-controller=\"Home\" asp-action=\"Index\">Home</a>",
        "                        </li>",
+    ]
+
+    lines2 = [
        "                    </ul>",
        "                </div>",
        "            </div>",
@@ -355,6 +378,7 @@ def build_layout(project_name):
        "",
     ]
 
+    lines = lines1 + extra_lines + lines2
     new_file_contents = ""
     for line in lines:
         new_file_contents += line + "\n"
@@ -378,7 +402,311 @@ def build_index(project_name):
         new_file_contents += line + "\n"
     os.system(f"cat > ./{project_name}/Views/Home/Index.cshtml << EOF\n{new_file_contents}")
 
-def add_login_and_registration(project_name, context_name):
+def CRUD(project_name, schema_s, schema_p, attributes):
+
+    def build_schema_s(project_name, schema_s, schema_p, attributes):
+        lines1 = [
+        "@{",
+        f"    ViewData[\"Title\"] = \"One Single {schema_s}\";",
+        "}",
+        "",
+        f"@model {schema_s}",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 text-center\">",
+        f"        <h1>One Single {schema_s}</h1>",
+        "    </div>",
+        "</div>",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 col-md-10 offset-md-1\">",
+        f"        <p>Id: @Model.{schema_s}Id</p>",
+        ]
+        lines2 = []
+        for attribute in attributes:
+            lines2.append(f"        <p>{attribute}: @Model.{attribute}</p>")
+
+        lines3 =[
+        "        <p>Created At: @Model.CreatedAt</p>",
+        "        <p>Updated At: @Model.UpdatedAt</p>",
+        "    </div>",
+        "</div>",
+        "",
+        "",
+        ]
+
+        lines = lines1 + lines2 + lines3
+        
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+
+        os.system(f"cat > ./{project_name}/Views/Home/{schema_s}.cshtml << EOF\n{new_file_contents}")
+
+    def build_schema_p(project_name, schema_s, schema_p, attributes):
+        schema_s_lower = schema_s.lower()
+        lines1 = [
+        "@{",
+        f"    ViewData[\"Title\"] = \"All {schema_p}\";",
+        "}",
+        "",
+        f"@model {schema_s}[]",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 text-center\">",
+        f"        <h1>All {schema_p}</h1>",
+        "    </div>",
+        "</div>",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 col-md-10 offset-md-1\">",
+        "        <table class=\"table table-bordered table-striped\">",
+        "            <thead class=\"thead-dark\">",
+        "                <tr>",
+        "                    <th>Id</th>",
+        ]
+
+        lines2 = []
+        for attribute in attributes:
+            lines2.append(f"                    <th>{attribute}</th>")
+
+        lines3 = [
+        "                    <th>Created At</th>",
+        "                    <th>Updated At</th>",
+        "                </tr>",
+        "            </thead>",
+        "            <tbody>",
+        f"                @foreach ({schema_s} {schema_s_lower} in Model)",
+        "                {",
+        f"                    string url = $\"/{schema_s_lower}/"+"{"+f"{schema_s_lower}.{schema_s}Id"+"}\";",
+        "                <tr>",
+        f"                    <td>@{schema_s_lower}.{schema_s}Id</td>",
+        ]
+        lines4 = []
+        lines4.append(f"                    <td><a href=@url>@{schema_s_lower}.{attributes[0]}</a></td>")
+        for attribute in attributes[1::]:
+            lines4.append(f"                    <td>@{schema_s_lower}.{attribute}</td>")
+
+        lines5 = [
+        f"                    <td>@{schema_s.lower()}.CreatedAt</td>",
+        f"                    <td>@{schema_s.lower()}.UpdatedAt</td>",
+        "                </tr>",
+        "                }",
+        "            </tbody>",
+        "        </table>",
+        "    </div>",
+        "</div>",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 col-md-10 offset-md-1 text-right\">",
+        f"        <a asp-action=\"Create{schema_s}Form\" class=\"btn btn-primary\">Create a {schema_s}</a>",
+        "    </div>",
+        "</div>",
+        "",
+        ]
+
+        lines = lines1 + lines2 + lines3 + lines4 + lines5
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+
+        os.system(f"cat > ./{project_name}/Views/Home/{schema_p}.cshtml << EOF\n{new_file_contents}")
+
+    def build_create_schema_s_form(project_name, schema_s, schema_p, attributes):
+        lines1 =  [
+        "@{",
+        f"    ViewData[\"Title\"] = \"Create a {schema_s}\";",
+        "}",
+        "",
+        f"@model {schema_s}",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 text-center\">",
+        f"        <h1>Create a {schema_s}</h1>",
+        "    </div>",
+        "</div>",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 col-md-10 offset-md-1\">",
+        f"        <form asp-action=\"Create{schema_s}\" asp-controller=\"Home\" method=\"post\">",
+        "",
+        ]
+        lines2 = []
+        for attribute in attributes:
+            lines2.append("            <div class=\"form-group\">")
+            lines2.append(f"                <label asp-for=\"{attribute}\"></label>&nbsp<span asp-validation-for=\"{attribute}\" class=\"error-message\"></span>")
+            lines2.append(f"                <input asp-for=\"{attribute}\" class=\"form-control\" />")
+            lines2.append("            </div>")
+
+
+        lines3 = [
+        "            <div class=\"form-group text-right\">",
+        f"                <button class=\"btn btn-primary\">Add a {schema_s}</button>",
+        "            </div>",
+        "        </form>",
+        "    </div>",
+        "</div>",
+        "",
+        "",
+        ]
+
+        lines = lines1 + lines2 + lines3
+
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+
+        os.system(f"cat > ./{project_name}/Views/Home/Create{schema_s}Form.cshtml << EOF\n{new_file_contents}")
+
+    def build_edit_schema_s_form(project_name, schema_s, schema_p, attributes):
+        lines1 = [
+        "@{",
+        f"    ViewData[\"Title\"] = \"Read/Update/Delete a {schema_s}\";",
+        "}",
+        "",
+        f"@model {schema_s}",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 text-center\">",
+        f"        <h1>Read/Update/Delete a {schema_s}</h1>",
+        "    </div>",
+        "</div>",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 col-md-10 offset-md-1\">",
+        f"        <form asp-action=\"Update{schema_s}\" asp-route-{schema_s.lower()}Id=@Model.{schema_s}Id asp-controller=\"Home\" method=\"post\">",
+        ]
+        lines2 = []
+        for attribute in attributes:
+            lines2.append("            <div class=\"form-group\">")
+            lines2.append(f"                <label asp-for=\"{attribute}\"></label>&nbsp<span asp-validation-for=\"{attribute}\" class=\"error-message\"></span>")
+            lines2.append(f"                <input asp-for=\"{attribute}\" class=\"form-control\" />")
+            lines2.append("            </div>")
+
+        lines3 = [
+        "            <div class=\"form-group text-right\">",
+        f"                <button class=\"btn btn-primary\">Edit {schema_s}</button>",
+        "            </div>",
+        "        </form>",
+        "    </div>",
+        "</div>",
+        "",
+        "<div class=\"row\">",
+        "    <div class=\"col-12 col-md-10 offset-md-1\">",
+        f"        <form asp-action=\"Delete{schema_s}\" asp-route-{schema_s.lower()}Id=@Model.{schema_s}Id asp-controller=\"Home\" method=\"post\">",
+        "            <input type=\"hidden\" name=\"Delete\" />",
+        "            <div class=\"form-group text-center\">",
+        f"                <button class=\"btn btn-danger\">Delete this {schema_s}</button>",
+        "            </div>",
+        "        </form>",
+        "    </div>",
+        "</div>",
+        "",
+        ]
+
+        lines = lines1 + lines2 + lines3
+
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+
+        os.system(f"cat > ./{project_name}/Views/Home/Edit{schema_s}Form.cshtml << EOF\n{new_file_contents}")
+
+    def build_controller_methods(project_name, schema_s, schema_p, attributes):
+        # returns a list of lines to be added to Home.Controller
+        lines = [
+        f"        ///////////// BEGINNING OF CRUD METHODS FOR {schema_s.upper()} MODEL /////////////",
+        "",
+        f"        // GET ALL {schema_p}",
+        f"        [HttpGet(\"{schema_p.lower()}\")]",
+        f"        public IActionResult {schema_p}()",
+        "        {",
+        f"            {schema_s}[] All{schema_p} = dbContext.{schema_p}.ToArray();",
+        f"            return View(\"{schema_p}\", All{schema_p});",
+        "        }",
+        "",
+        f"        //  GET One Single {schema_s} (Read/Update/Delete this {schema_s.lower()})",
+        f"        [HttpGet(\"{schema_s.lower()}/"+"{"+f"{schema_s.lower()}Id"+"}\")]",
+        f"        public IActionResult {schema_s}(int {schema_s.lower()}Id)",
+        "        {",
+        f"            {schema_s} OneSingle{schema_s} = dbContext.{schema_p}.FirstOrDefault(b => b.{schema_s}Id == {schema_s.lower()}Id);",
+        f"            return View(\"Edit{schema_s}Form\", OneSingle{schema_s});",
+        "        }",
+        "",
+        f"        // POST Update One Single {schema_s}",
+        f"        [HttpPost(\"{schema_s.lower()}/"+"{"+f"{schema_s.lower()}Id"+"}\")]",
+        f"        public IActionResult Update{schema_s}(int {schema_s.lower()}Id, {schema_s} {schema_s.lower()})",
+        "        {",
+        "            if (ModelState.IsValid)",
+        "            {",
+        f"                {schema_s.lower()}.{schema_s}Id = {schema_s.lower()}Id;",
+        f"                dbContext.Update({schema_s.lower()});",
+        f"                dbContext.Entry({schema_s.lower()}).Property(\"CreatedAt\").IsModified = false;",
+        "                dbContext.SaveChanges();",
+        f"                return RedirectToAction(\"{schema_p}\");",
+        "            }",
+        "            else",
+        "            {",
+        f"                {schema_s} OneSingle{schema_s} = dbContext.{schema_p}.FirstOrDefault(b => b.{schema_s}Id == {schema_s.lower()}Id);",
+        f"                return View(\"Edit{schema_s}Form\", OneSingle{schema_s});",
+        "            }",
+        "        }",
+        "",
+        f"        // POST Delete One Single {schema_s}",
+        f"        [HttpPost(\"{schema_s.lower()}/"+"{"+f"{schema_s.lower()}Id"+"}/delete\")]",
+        f"        public IActionResult Delete{schema_s}(int {schema_s.lower()}Id)",
+        "        {",
+        f"            {schema_s} OneSingle{schema_s} = dbContext.{schema_p}.FirstOrDefault(b => b.{schema_s}Id == {schema_s.lower()}Id);",
+        f"            dbContext.{schema_p}.Remove(OneSingle{schema_s});",
+        "            dbContext.SaveChanges();",
+        f"            return RedirectToAction(\"{schema_p}\");",
+        "        }",
+        "",
+        f"        // GET Create-A-{schema_s} Page",
+        f"        [HttpGet(\"create-a-{schema_s.lower()}\")]",
+        f"        public IActionResult Create{schema_s}Form()",
+        "        {",
+        "            return View();",
+        "        }",
+        "",
+        f"        // POST Create One Single {schema_s}",
+        f"        [HttpPost(\"{schema_s.lower()}\")]",
+        f"        public IActionResult Create{schema_s}({schema_s} {schema_s.lower()})",
+        "        {",
+        "            if (ModelState.IsValid)",
+        "            {",
+        f"                dbContext.Add({schema_s.lower()});",
+        "                dbContext.SaveChanges();",
+        f"                return RedirectToAction(\"{schema_p}\");",
+        "            }",
+        f"            return View(\"Create{schema_s}Form\");",
+        "        }",
+        "",
+        f"        ///////////// END OF CRUD METHODS FOR {schema_s.upper()} MODEL /////////////",
+        "",
+        ]
+        return lines
+
+    def build_layout_navbar_lines(project_name, schema_s, schema_p):
+        lines = [
+        "                        <li class=\"nav-item\">",
+        f"                            <a class=\"nav-link text-dark\" asp-area=\"\" asp-controller=\"Home\" asp-action=\"{schema_p}\">{schema_p}</a>",
+        "                        </li>",
+        ]
+        return lines
+
+    schema_s = schema_s.capitalize()
+    schema_p = schema_p.capitalize()
+    build_schema_s(project_name, schema_s, schema_p, attributes)
+    build_schema_p(project_name, schema_s, schema_p, attributes)
+    build_create_schema_s_form(project_name, schema_s, schema_p, attributes)
+    build_edit_schema_s_form(project_name, schema_s, schema_p, attributes)
+    layout_lines = build_layout_navbar_lines(project_name, schema_s, schema_p)
+    controller_methods = build_controller_methods(project_name, schema_s, schema_p, attributes)
+
+    return controller_methods, layout_lines
+
+def add_login_and_registration(project_name, context_name, extra_controller_lines):
     def build_user_class(project_name):
         lines = [
         "using System;",
@@ -550,153 +878,156 @@ def add_login_and_registration(project_name, context_name):
             new_file_contents += line + "\n"
         os.system(f"cat > ./{project_name}/Views/Home/Index.cshtml << EOF\n{new_file_contents}")
 
-    def build_controller_with_login_and_registration(project_name, context_name):
+    def build_controller_with_login_and_registration(project_name, context_name, extra_controller_lines):
 
-        lines = [
-        "using System;",
-        "using System.Collections.Generic;",
-        "using System.Diagnostics;",
-        "using System.Linq;",
-        "using System.Threading.Tasks;",
-        "using Microsoft.AspNetCore.Mvc;",
-        "using Microsoft.EntityFrameworkCore;",
-        "using Microsoft.AspNetCore.Http; // for session",
-        "using Microsoft.AspNetCore.Identity; // for password hashing", 
-        f"using {project_name}.Models;",
-        "",
-        f"namespace {project_name}.Controllers",
-        "{",
-        "    public class HomeController : Controller",
-        "    {",
-        "",
-        f"        private {context_name} dbContext;",
-        "",
-        f"        public HomeController({context_name} context)",
-        "        {",
-        "            dbContext = context;",
-        "        }",
-        "",
-        "        // ROUTE:               METHOD:                VIEW:",
-        "        // -----------------------------------------------------------------------------------",
-        "        // GET(\"\")              Index()                Index.cshtml",
-        "        // POST(\"/register\")    Create(User user)      ------ (Index.cshtml to display errors)",
-        "        // POST(\"/login\")       Login(LoginUser user)  ------ (Index.cshtml to display errors)",
-        "        // GET(\"/logout\")       Logout()               ------",
-        "        // GET(\"/success\")      Success()              Success.cshtml",
-        "",
-        "        [HttpGet(\"\")]",
-        "        public IActionResult Index()",
-        "        {",
-        "            //List<User> AllUsers = dbContext.Users.ToList();",
-        "            return View();",
-        "        }",
-        "",
-        "        [HttpPost(\"/register\")]",
-        "        public IActionResult Create(User user)",
-        "        {",
-        "            if (ModelState.IsValid)",
-        "            {",
-        "                // If a User exists with provided email",
-        "                if (dbContext.Users.Any(u => u.Email == user.Email))",
-        "                {",
-        "                    // Manually add a ModelState error to the Email field",
-        "                    ModelState.AddModelError(\"Email\", \"Email already in use!\");",
-        "                    return View(\"Index\");",
-        "                }",
-        "",
-        "                // hash password",
-        "                PasswordHasher<User> Hasher = new PasswordHasher<User>();",
-        "                user.Password = Hasher.HashPassword(user, user.Password);",
-        "",
-        "                // create user",
-        "                dbContext.Add(user);",
-        "                dbContext.SaveChanges();",
-        "",
-        "                // sign user into session",
-        "                var NewUser = dbContext.Users.FirstOrDefault(u => u.Email == user.Email);",
-        "                int UserId = NewUser.UserId;",
-        "                HttpContext.Session.SetInt32(\"UserId\", UserId);",
-        "",
-        "                // go to success",
-        "                return RedirectToAction(\"Success\");",
-        "            }",
-        "            // display errors",
-        "            else",
-        "            {",
-        "                return View(\"Index\");",
-        "            }",
-        "        }",
-        "",
-        "        [HttpPost(\"/login\")]",
-        "        public IActionResult Login(LoginUser user)",
-        "        {",
-        "            if (ModelState.IsValid)",
-        "            {",
-        "                var userInDb = dbContext.Users.FirstOrDefault(u => u.Email == user.LoginEmail);",
-        "                if (userInDb == null)",
-        "                {",
-        "                    // Add an error to ModelState and return to View!",
-        "                    ModelState.AddModelError(\"LoginEmail\", \"Invalid Email/Password\");",
-        "                    return View(\"Index\");",
-        "                }",
-        "                // Initialize hasher object",
-        "                var hasher = new PasswordHasher<LoginUser>();",
-        "",
-        "                // verify provided password against hash stored in db",
-        "                var result = hasher.VerifyHashedPassword(user, userInDb.Password, user.LoginPassword);",
-        "                if (result == 0)",
-        "                {",
-        "                    // handle failure (this should be similar to how \"existing email\" is handled)",
-        "                    ModelState.AddModelError(\"LoginPassword\", \"Password is invalid.\");",
-        "                    return View(\"Index\");",
-        "                }",
-        "",
-        "                // sign user into session",
-        "                int UserId = userInDb.UserId;",
-        "                HttpContext.Session.SetInt32(\"UserId\", UserId);",
-        "",
-        "                return RedirectToAction(\"Success\");",
-        "            }",
-        "            // display errors",
-        "            else",
-        "            {",
-        "                return View(\"Index\");",
-        "            }",
-        "        }",
-        "",
-        "        [HttpGet(\"/logout\")]",
-        "        public IActionResult Logout()",
-        "        {",
-        "            HttpContext.Session.Clear();",
-        "            return RedirectToAction(\"Index\");",
-        "        }",
-        "",
-        "        [HttpGet(\"success\")]",
-        "        public IActionResult Success()",
-        "        {",
-        "            int? userId = HttpContext.Session.GetInt32(\"UserId\");",
-        "            if (userId == null)",
-        "            {",
-        "                return RedirectToAction(\"Index\");",
-        "            }",
-        "            return View();",
-        "        }",
-        "",
-        "        public IActionResult Privacy()",
-        "        {",
-        "            return View();",
-        "        }",
-        "",
-        "        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]",
-        "        public IActionResult Error()",
-        "        {",
-        "            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });",
-        "        }",
-        "    }",
-        "}",
-        "",
+        lines1 = [
+            "using System;",
+            "using System.Collections.Generic;",
+            "using System.Diagnostics;",
+            "using System.Linq;",
+            "using System.Threading.Tasks;",
+            "using Microsoft.AspNetCore.Mvc;",
+            "using Microsoft.EntityFrameworkCore;",
+            "using Microsoft.AspNetCore.Http; // for session",
+            "using Microsoft.AspNetCore.Identity; // for password hashing", 
+            f"using {project_name}.Models;",
+            "",
+            f"namespace {project_name}.Controllers",
+            "{",
+            "    public class HomeController : Controller",
+            "    {",
+            "",
+            f"        private {context_name} dbContext;",
+            "",
+            f"        public HomeController({context_name} context)",
+            "        {",
+            "            dbContext = context;",
+            "        }",
+            "",
+            "        // ROUTE:               METHOD:                VIEW:",
+            "        // -----------------------------------------------------------------------------------",
+            "        // GET(\"\")              Index()                Index.cshtml",
+            "        // POST(\"/register\")    Create(User user)      ------ (Index.cshtml to display errors)",
+            "        // POST(\"/login\")       Login(LoginUser user)  ------ (Index.cshtml to display errors)",
+            "        // GET(\"/logout\")       Logout()               ------",
+            "        // GET(\"/success\")      Success()              Success.cshtml",
+            "",
+            "        [HttpGet(\"\")]",
+            "        public IActionResult Index()",
+            "        {",
+            "            //List<User> AllUsers = dbContext.Users.ToList();",
+            "            return View();",
+            "        }",
+            "",
+            "        [HttpPost(\"/register\")]",
+            "        public IActionResult Create(User user)",
+            "        {",
+            "            if (ModelState.IsValid)",
+            "            {",
+            "                // If a User exists with provided email",
+            "                if (dbContext.Users.Any(u => u.Email == user.Email))",
+            "                {",
+            "                    // Manually add a ModelState error to the Email field",
+            "                    ModelState.AddModelError(\"Email\", \"Email already in use!\");",
+            "                    return View(\"Index\");",
+            "                }",
+            "",
+            "                // hash password",
+            "                PasswordHasher<User> Hasher = new PasswordHasher<User>();",
+            "                user.Password = Hasher.HashPassword(user, user.Password);",
+            "",
+            "                // create user",
+            "                dbContext.Add(user);",
+            "                dbContext.SaveChanges();",
+            "",
+            "                // sign user into session",
+            "                var NewUser = dbContext.Users.FirstOrDefault(u => u.Email == user.Email);",
+            "                int UserId = NewUser.UserId;",
+            "                HttpContext.Session.SetInt32(\"UserId\", UserId);",
+            "",
+            "                // go to success",
+            "                return RedirectToAction(\"Success\");",
+            "            }",
+            "            // display errors",
+            "            else",
+            "            {",
+            "                return View(\"Index\");",
+            "            }",
+            "        }",
+            "",
+            "        [HttpPost(\"/login\")]",
+            "        public IActionResult Login(LoginUser user)",
+            "        {",
+            "            if (ModelState.IsValid)",
+            "            {",
+            "                var userInDb = dbContext.Users.FirstOrDefault(u => u.Email == user.LoginEmail);",
+            "                if (userInDb == null)",
+            "                {",
+            "                    // Add an error to ModelState and return to View!",
+            "                    ModelState.AddModelError(\"LoginEmail\", \"Invalid Email/Password\");",
+            "                    return View(\"Index\");",
+            "                }",
+            "                // Initialize hasher object",
+            "                var hasher = new PasswordHasher<LoginUser>();",
+            "",
+            "                // verify provided password against hash stored in db",
+            "                var result = hasher.VerifyHashedPassword(user, userInDb.Password, user.LoginPassword);",
+            "                if (result == 0)",
+            "                {",
+            "                    // handle failure (this should be similar to how \"existing email\" is handled)",
+            "                    ModelState.AddModelError(\"LoginPassword\", \"Password is invalid.\");",
+            "                    return View(\"Index\");",
+            "                }",
+            "",
+            "                // sign user into session",
+            "                int UserId = userInDb.UserId;",
+            "                HttpContext.Session.SetInt32(\"UserId\", UserId);",
+            "",
+            "                return RedirectToAction(\"Success\");",
+            "            }",
+            "            // display errors",
+            "            else",
+            "            {",
+            "                return View(\"Index\");",
+            "            }",
+            "        }",
+            "",
+            "        [HttpGet(\"/logout\")]",
+            "        public IActionResult Logout()",
+            "        {",
+            "            HttpContext.Session.Clear();",
+            "            return RedirectToAction(\"Index\");",
+            "        }",
+            "",
+            "        [HttpGet(\"success\")]",
+            "        public IActionResult Success()",
+            "        {",
+            "            int? userId = HttpContext.Session.GetInt32(\"UserId\");",
+            "            if (userId == null)",
+            "            {",
+            "                return RedirectToAction(\"Index\");",
+            "            }",
+            "            return View();",
+            "        }",
+            "",
         ]
 
+        lines2 = [
+            "        public IActionResult Privacy()",
+            "        {",
+            "            return View();",
+            "        }",
+            "",
+            "        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]",
+            "        public IActionResult Error()",
+            "        {",
+            "            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });",
+            "        }",
+            "    }",
+            "}",
+            "",
+        ]
+        lines = lines1 + extra_controller_lines + lines2
         new_file_contents = ""
         for line in lines:
             new_file_contents += line + "\n"
@@ -744,19 +1075,17 @@ def add_login_and_registration(project_name, context_name):
     build_registration_partial()
     build_login_partial()
     build_login_and_registration_index()
-    build_controller_with_login_and_registration(project_name, context_name)
+    build_controller_with_login_and_registration(project_name, context_name, extra_controller_lines)
     customize_css(project_name)
     build_success()
 
-
 def make_migrations(project_name):
-    
     migration_name = input("What is this migration called (i.e., 'FirstMigration'): ")
-    
     os.chdir(f"{pathlib.Path(__file__).parent.absolute()}/{project_name}")
     os.system(f"dotnet ef migrations add {migration_name}")
     os.system(f"dotnet ef database update")
-
+    path = f"{pathlib.Path(__file__).parent.absolute()}/{project_name}"
+    os.system(f"dotnet watch -p {path} run")
 
 def viper():
     print("Welcome to Viper. Let's build a project.")
@@ -773,6 +1102,15 @@ def viper():
     models = []
     context = input("Enter name of context: ")
     use_login_and_registration = input("Y/n - Would you like to add Login and Registration? ")
+
+    output = build_models(project_name)
+    models += output[0]
+
+    controller_lines = output[1]
+    layout_lines = output[2]
+    # models += build_models(project_name)
+
+
     if use_login_and_registration in ["Y","y","YES","Yes","yes"]:
         use_login_and_registration = True
     else:
@@ -780,16 +1118,15 @@ def viper():
     if use_login_and_registration:
         models.append( ("User", "Users") )
         # run login_and_reg codes
-        add_login_and_registration(project_name, context)
+        add_login_and_registration(project_name, context, controller_lines)
 
-    models += build_models(project_name)
 
     # context = input("Enter name of context: ")
     build_context_file(project_name, context, models)
     build_startup_file(project_name, context)
     if not use_login_and_registration:
-        build_controller(project_name, context)
-    build_layout(project_name)
+        build_controller(project_name, context, controller_lines)
+    build_layout(project_name, layout_lines)
     if not use_login_and_registration:
         build_index(project_name)
 
@@ -801,10 +1138,9 @@ def viper():
     wants_to_make_migrations = input("Y/n - Would you like to make migrations? (Not recommended if you want to customize your models further. ")
     if wants_to_make_migrations in ["y","Y","yes","YES","Yes"]:
         make_migrations(project_name)
-        path = f"{pathlib.Path(__file__).parent.absolute()}" 
     else:
         path = f"{pathlib.Path(__file__).parent.absolute()}/{project_name}"
-    os.system(f"dotnet watch -p {path} run")
+        os.system(f"dotnet watch -p {path} run")
 
     return True
 
