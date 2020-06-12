@@ -1130,8 +1130,7 @@ def make_migrations(project_name, message):
     os.system(f"dotnet ef database update")
     print()
     print(f'\033[93m{message}\033[00m')
-    path = f"{pathlib.Path(__file__).parent.absolute()}"
-    os.system(f"dotnet watch -p {path} run")
+    os.system(f"dotnet watch run")
 
 def viper():
     candies = candy()
