@@ -1195,6 +1195,9 @@ def make_migrations(project_name, message):
     os.system(f"dotnet ef database update")
     print()
     print(f'\033[93m{message}\033[00m')
+    print(f'\033[93m{"                Thanks for using Viper CLI."}\033[00m')
+    print(f'\033[93m{"                  Launching your project..."}\033[00m')
+
     os.system(f"dotnet watch run")
 
 def viper():
@@ -1268,6 +1271,8 @@ def viper():
         print()
         print(f'\033[93m{candies[2]}\033[00m')
         path = f"{pathlib.Path(__file__).parent.absolute()}/{project_name}"
+        print(f'\033[93m{"                Thanks for using Viper CLI."}\033[00m')
+        print(f'\033[93m{"                  Launching your project..."}\033[00m')
         os.system(f"dotnet watch -p {path} run")
 
     return True
