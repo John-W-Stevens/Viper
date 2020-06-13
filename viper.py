@@ -233,52 +233,55 @@ def build_models(project_name):
                 break
 
         # One-To-Many
-        res = input(f'\033[92m{"Y/n - Is this model part of a one-to-many relationship? "}\033[00m')
-        if is_yes(res):
-            side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
-            # model on the Many side
-            if is_yes(side):
-                while True:
-                    one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
-                    message = f"Y/n - You entered: {one} as the model on the one side of the reltationship. Is this correct? "
-                    res = input(f'\033[92m{message}\033[00m')
-                    if res:
-                        break
-                # model needs foregin key and nav property:
-                attributes.append(f"{one}Id")
-                display = ""
-                while True:
-                    # change_display = input("Y/n - Would you like to change the default display? ")
-                    change_display = input(f'\033[92m{"Y/n - Would you like to change the default display of the foreign key field? "}\033[00m')
-                    if is_yes(change_display):
-                        # d = input("Enter custom display message: ")
-                        d = input(f'\033[92m{"Enter custom display message: "}\033[00m')
-                        # r = input(f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? ")
-                        message = f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? "
-                        r = input(f'\033[92m{message}\033[00m')
-                        if is_yes(r):
-                            display = d
+        while True:
+            res = input(f'\033[92m{"Y/n - Would you like to add a one-to-many relationship to this model? "}\033[00m')
+            if is_yes(res):
+                side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
+                # model on the Many side
+                if is_yes(side):
+                    while True:
+                        one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
+                        message = f"Y/n - You entered: {one} as the model on the one side of the reltationship. Is this correct? "
+                        res = input(f'\033[92m{message}\033[00m')
+                        if res:
                             break
-                    else:
-                        break
-                if display != "":
-                    lines2.append(f'        [Display(Name = "{display}")]')
-                lines2.append(f"        public int {one}Id " + "{ get; set; }")
-                lines2.append(f"        public {one} Creator " + "{ get; set; }")
-                lines2.append("")
+                    # model needs foregin key and nav property:
+                    attributes.append(f"{one}Id")
+                    display = ""
+                    while True:
+                        # change_display = input("Y/n - Would you like to change the default display? ")
+                        change_display = input(f'\033[92m{"Y/n - Would you like to change the default display of the foreign key field? "}\033[00m')
+                        if is_yes(change_display):
+                            # d = input("Enter custom display message: ")
+                            d = input(f'\033[92m{"Enter custom display message: "}\033[00m')
+                            # r = input(f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? ")
+                            message = f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? "
+                            r = input(f'\033[92m{message}\033[00m')
+                            if is_yes(r):
+                                display = d
+                                break
+                        else:
+                            break
+                    if display != "":
+                        lines2.append(f'        [Display(Name = "{display}")]')
+                    lines2.append(f"        public int {one}Id " + "{ get; set; }")
+                    lines2.append(f"        public {one} Creator " + "{ get; set; }")
+                    lines2.append("")
 
-            # model on the One side
+                # model on the One side
+                else:
+                    while True:
+                        one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
+                        one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
+                        message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the reltationship. Is this correct? "
+                        res = input(f'\033[92m{message}\033[00m')
+                        if res:
+                            break
+                    lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
+                    lines2.append("")
             else:
-                while True:
-                    one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
-                    one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
-                    message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the reltationship. Is this correct? "
-                    res = input(f'\033[92m{message}\033[00m')
-                    if res:
-                        break
-                lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
-                lines2.append("")
-
+                break
+        
         lines3 = [
         "        [Required]",
         "        public DateTime CreatedAt { get; set; }",
@@ -833,35 +836,39 @@ def add_login_and_registration(project_name, context_name, extra_controller_line
             "        public string Password { get; set; }",
             "",
         ]
+
         lines2 = []
 
         # One-To-Many
-        res = input(f'\033[92m{"Y/n - Is the Login/Registration User model part of a one-to-many relationship? "}\033[00m')
-        if is_yes(res):
-            side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
-            # model on the Many side
-            if is_yes(side):
-                while True:
-                    one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
-                    message = f"Y/n - You entered: {one} as the model on the one side of the reltationship. Is this correct? "
-                    res = input(f'\033[92m{message}\033[00m')
-                    if res:
-                        break
-                # model needs foregin key and nav property:
-                lines2.append(f"        public int {one}Id " + "{ get; set; }")
-                lines2.append(f"        public {one} Creator " + "{ get; set }")
-                lines2.append("")
-            # model on the One side
+        while True:
+            res = input(f'\033[92m{"Y/n - Would you like to add a one-to-many relationship to the Login/Registration User model? "}\033[00m')
+            if is_yes(res):
+                side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
+                # model on the Many side
+                if is_yes(side):
+                    while True:
+                        one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
+                        message = f"Y/n - You entered: {one} as the model on the one side of the reltationship. Is this correct? "
+                        res = input(f'\033[92m{message}\033[00m')
+                        if res:
+                            break
+                    # model needs foregin key and nav property:
+                    lines2.append(f"        public int {one}Id " + "{ get; set; }")
+                    lines2.append(f"        public {one} Creator " + "{ get; set }")
+                    lines2.append("")
+                # model on the One side
+                else:
+                    while True:
+                        one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
+                        one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
+                        message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the reltationship. Is this correct? "
+                        res = input(f'\033[92m{message}\033[00m')
+                        if res:
+                            break
+                    lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
+                    lines2.append("")
             else:
-                while True:
-                    one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
-                    one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
-                    message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the reltationship. Is this correct? "
-                    res = input(f'\033[92m{message}\033[00m')
-                    if res:
-                        break
-                lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
-                lines2.append("")
+                break
 
 
         lines3 = [
