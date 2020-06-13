@@ -181,7 +181,7 @@ def build_models(project_name):
 
         while True:
             # res = input("Would you like to add an attribute? ")
-            res = input(f'\033[92m{"Would you like to add an attribute? "}\033[00m')
+            res = input(f'\033[92m{"Y/n - Would you like to add an attribute? "}\033[00m')
             if is_yes(res):
                 # label = input("What is this attribute called? ")
                 label = input(f'\033[92m{"What is this attribute called? "}\033[00m')
@@ -241,7 +241,7 @@ def build_models(project_name):
                 if is_yes(side):
                     while True:
                         one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
-                        message = f"Y/n - You entered: {one} as the model on the one side of the reltationship. Is this correct? "
+                        message = f"Y/n - You entered: {one} as the model on the one side of the relationship. Is this correct? "
                         res = input(f'\033[92m{message}\033[00m')
                         if res:
                             break
@@ -273,7 +273,7 @@ def build_models(project_name):
                     while True:
                         one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
                         one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
-                        message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the reltationship. Is this correct? "
+                        message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the relationship. Is this correct? "
                         res = input(f'\033[92m{message}\033[00m')
                         if res:
                             break
@@ -390,7 +390,11 @@ def build_controller(project_name, context_name, extra_lines):
         new_file_contents += line + "\n"
     os.system(f"cat > ./{project_name}/Controllers/HomeController.cs << EOF\n{new_file_contents}")
 
-def build_layout(project_name, extra_lines):
+def build_layout(project_name, extra_lines, session=False):
+
+    lines0 = []
+    if session:
+        lines0.append("@using Microsoft.AspNetCore.Http")
 
     lines1 = [
        "<!DOCTYPE html>",
@@ -398,7 +402,7 @@ def build_layout(project_name, extra_lines):
        "<head>",
        "    <meta charset=\"utf-8\" />",
        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />",
-       "    <title>@ViewData[\"Title\"] - TestProject</title>",
+       f"    <title>@ViewData[\"Title\"] - {project_name}</title>",
        "",
        "    <environment include=\"Development\">",
        "        <link rel=\"stylesheet\" href=\"~/lib/bootstrap/dist/css/bootstrap.css\" />",
@@ -416,7 +420,7 @@ def build_layout(project_name, extra_lines):
        "    <header>",
        "        <nav class=\"navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3\">",
        "            <div class=\"container\">",
-       "                <a class=\"navbar-brand\" asp-area=\"\" asp-controller=\"Home\" asp-action=\"Index\">TestProject</a>",
+       f"                <a class=\"navbar-brand\" asp-area=\"\" asp-controller=\"Home\" asp-action=\"Index\">{project_name}</a>",
        "                <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\".navbar-collapse\" aria-controls=\"navbarSupportedContent\"",
        "                        aria-expanded=\"false\" aria-label=\"Toggle navigation\">",
        "                    <span class=\"navbar-toggler-icon\"></span>",
@@ -428,9 +432,18 @@ def build_layout(project_name, extra_lines):
        "                        </li>",
     ]
 
+
     lines2 = [
        "                    </ul>",
        "                </div>",
+    ]
+    if session:
+        lines2.append('                @if (Context.Session.GetInt32("UserId") != null)')
+        lines2.append('                {')
+        lines2.append('                    <a asp-action="Logout">Logout</a>')
+        lines2.append('                }')
+
+    lines3 = [
        "            </div>",
        "        </nav>",
        "    </header>",
@@ -472,7 +485,7 @@ def build_layout(project_name, extra_lines):
        "",
     ]
 
-    lines = lines1 + extra_lines + lines2
+    lines = lines0 + lines1 + extra_lines + lines2 + lines3
     new_file_contents = ""
     for line in lines:
         new_file_contents += line + "\n"
@@ -849,7 +862,7 @@ def add_login_and_registration(project_name, context_name, extra_controller_line
                 if is_yes(side):
                     while True:
                         one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
-                        message = f"Y/n - You entered: {one} as the model on the one side of the reltationship. Is this correct? "
+                        message = f"Y/n - You entered: {one} as the model on the one side of the relationship. Is this correct? "
                         res = input(f'\033[92m{message}\033[00m')
                         if res:
                             break
@@ -862,7 +875,7 @@ def add_login_and_registration(project_name, context_name, extra_controller_line
                     while True:
                         one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
                         one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
-                        message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the reltationship. Is this correct? "
+                        message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the relationship. Is this correct? "
                         res = input(f'\033[92m{message}\033[00m')
                         if res:
                             break
@@ -1194,18 +1207,6 @@ def add_login_and_registration(project_name, context_name, extra_controller_line
 
         os.system(f"cat > ./{project_name}/Views/Home/Success.cshtml << EOF\n{new_file_contents}")
 
-    # def customize_css(project_name):
-    #     lines = [
-    #     ".error-message{",
-    #     "    font-size: 14px;",
-    #     "    color: red;",
-    #     "}",
-    #     ]
-    #     new_file_contents = ""
-    #     for line in lines:
-    #         new_file_contents += line + "\n"
-    #     os.system(f"cat >> ./{project_name}/wwwroot/css/site.css << EOF\n{new_file_contents}")
-
     build_user_class(project_name)
     build_login_user_class(project_name)
     build_registration_partial()
@@ -1293,7 +1294,10 @@ def viper():
     build_startup_file(project_name, context)
     if not use_login_and_registration:
         build_controller(project_name, context, controller_lines)
-    build_layout(project_name, layout_lines)
+    if use_login_and_registration:
+        build_layout(project_name, layout_lines, session=True)
+    else:
+        build_layout(project_name, layout_lines)
     if not use_login_and_registration:
         build_index(project_name)
 
