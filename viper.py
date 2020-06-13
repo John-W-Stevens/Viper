@@ -789,8 +789,9 @@ def CRUD(project_name, schema_s, schema_p, attributes):
         ]
         return lines
 
-    schema_s = schema_s.capitalize()
-    schema_p = schema_p.capitalize()
+    # schema_s = schema_s.capitalize()
+    # schema_p = schema_p.capitalize()
+    
     # build_schema_s(project_name, schema_s, schema_p, attributes) -> Uncomment this line in order to create this razor page
     build_schema_p(project_name, schema_s, schema_p, attributes)
     build_create_schema_s_form(project_name, schema_s, schema_p, attributes)
