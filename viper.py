@@ -265,7 +265,7 @@ def build_models(project_name):
                     if display != "":
                         lines2.append(f'        [Display(Name = "{display}")]')
                     lines2.append(f"        public int {one}Id " + "{ get; set; }")
-                    lines2.append(f"        public {one} Creator " + "{ get; set; }")
+                    lines2.append(f"        public {one} {one}Creator " + "{ get; set; }")
                     lines2.append("")
 
                 # model on the One side
