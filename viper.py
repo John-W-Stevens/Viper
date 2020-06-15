@@ -1306,35 +1306,52 @@ def map_database_relationships(project_name, models):
             sys.stdout.write(line)
 
     # one-to-many
-    print("Let's configure your database relationships.")
+    message = "Let's configure your database relationships."
+    print(f'\033[92m{message}\033[00m')
+    # print("Let's configure your database relationships.")
+
     while True:
-        wants_one_to_many = is_yes(input("Y/n - Would you like to add a one-to-many relationship between two models? "))
+        wants_one_to_many = is_yes(input(f'\033[92m{"Y/n - Would you like to add a one-to-many relationship between two models? "}\033[00m'))
+        # wants_one_to_many = is_yes(input("Y/n - Would you like to add a one-to-many relationship between two models? "))
         if not wants_one_to_many:
             break
-        print(f"Your models include: {display_models}")
+        error_message = "Oops, that model doesn't exist. "
+        message = f"Your models include: {display_models}"
+        # print(f"Your models include: {display_models}")
+        print(f'\033[92m{message}\033[00m')
         model1 = ""
         model2 = ""
         while True:
-            model1 = input("Please enter the name of the model on the one side of this relationship: ")
+            # model1 = input("Please enter the name of the model on the one side of this relationship: ")
+            model1 = input(f'\033[92m{"Please enter the name of the model on the one side of this relationship: "}\033[00m')
             if model1 in display_models:
                 break
-            print("Oops, that model doesn't exist. ")
+            # print("Oops, that model doesn't exist. ")
+            print(f'\033[92m{error_message}\033[00m')
         while True:
-            model2 = input("Please enter the name of the model on the many side of this relationship: ")
+            # model2 = input("Please enter the name of the model on the many side of this relationship: ")
+            model2 = input(f'\033[92m{"Please enter the name of the model on the many side of this relationship: "}\033[00m')
             if model2 in display_models:
                 break
-            print("Oops, that model doesn't exist. ")
+            # print("Oops, that model doesn't exist. ")
+            print(f'\033[92m{error_message}\033[00m')
         
         # add navigation property to One Model
-        m1_nav_prop_label = input("What is the label of the 'One' model's navigation property? ")
+        # m1_nav_prop_label = input("What is the label of the 'One' model's navigation property? ")
+        message = "What is the label of the 'One' model's navigation property? "
+        m1_nav_prop_label = input(f'\033[92m{message}\033[00m')
         m1_nav_property = f"        public List<{model2}> {m1_nav_prop_label} " + "{ get; set; }\n"
 
         # add foreign key and navigation property to Many Model
-        m2_nav_prop_label = input("What is the label of the 'Many' model's navigation property? ")
+        # m2_nav_prop_label = input("What is the label of the 'Many' model's navigation property? ")
+        message = "What is the label of the 'Many' model's navigation property? "
+        m2_nav_prop_label = input(f'\033[92m{message}\033[00m')
         m2_foreign_key = f"        public int {model1}Id " + "{ get; set; }\n"
         m2_nav_property = f"        public {model1} {m2_nav_prop_label} " + "{ get; set; }\n"
 
-        res = input(f"Y/n - Add this relationship between {model1} and {model2}? ")
+        # res = input(f"Y/n - Add this relationship between {model1} and {model2}? ")
+        message = f"Y/n - Add this relationship between {model1} and {model2}? "
+        res = input(f'\033[92m{message}\033[00m')
         if not is_yes(res):
             break
         
@@ -1343,31 +1360,46 @@ def map_database_relationships(project_name, models):
         
     # many-to-many
     while True:
-        wants_many_to_many = is_yes(input("Y/n - Would you like to add a many-to-many relationship between two models? "))
+        # wants_many_to_many = is_yes(input("Y/n - Would you like to add a many-to-many relationship between two models? "))
+        wants_many_to_many = is_yes(input(f'\033[92m{"Y/n - Would you like to add a many-to-many relationship between two models? "}\033[00m'))
         if not wants_many_to_many:
             break
-        print(f"Your models include: {display_models}")
+        message = f"Your models include: {display_models}"
+        # print(f"Your models include: {display_models}")
+        print(f'\033[92m{message}\033[00m')
         model1 = ""
         model2 = ""
         while True:
-            model1 = input("Please enter the name of the first model: ")
+            # model1 = input("Please enter the name of the first model: ")
+            model1 = input(f'\033[92m{"Please enter the name of the first model: "}\033[00m')
             if model1 in display_models:
                 break
-            print("Oops, that model doesn't exist. ")
+            # print("Oops, that model doesn't exist. ")
+            print(f'\033[92m{error_message}\033[00m')
         while True:
-            model2 = input("Please enter the name of the second model: ")
+            # model2 = input("Please enter the name of the second model: ")
+            model2 = input(f'\033[92m{"Please enter the name of the second model: "}\033[00m')
             if model2 in display_models:
                 break
-            print("Oops, that model doesn't exist. ")
+            # print("Oops, that model doesn't exist. ")
+            print(f'\033[92m{error_message}\033[00m')
         
-        joining_table = input("What is the singular name of the joining table between these two models? ")
-        joining_table_plural = input("What is the plural name of the joining table between these two models? ")
+        # joining_table = input("What is the singular name of the joining table between these two models? ")
+        joining_table = input(f'\033[92m{"What is the singular name of the joining table between these two models? "}\033[00m')
+
+        # joining_table_plural = input("What is the plural name of the joining table between these two models? ")
+        joining_table_plural = input(f'\033[92m{"What is the plural name of the joining table between these two models? "}\033[00m')
+
         models.append( (joining_table, joining_table_plural ))
 
-        m1_nav_prop_label = input("What is the label of the first model's navigation property? ")
+        # m1_nav_prop_label = input("What is the label of the first model's navigation property? ")
+        message = "What is the label of the first model's navigation property? "
+        m1_nav_prop_label = input(f'\033[92m{message}\033[00m')
         m1_nav_property = f"        public List<{joining_table}> {m1_nav_prop_label} " + "{ get; set; }\n"
 
-        m2_nav_prop_label = input("What is the label of the second model's navigation property? ")
+        # m2_nav_prop_label = input("What is the label of the second model's navigation property? ")
+        message = "What is the label of the second model's navigation property? "
+        m2_nav_prop_label = input(f'\033[92m{message}\033[00m')
         m2_nav_property = f"        public List<{joining_table}> {m2_nav_prop_label} " + "{ get; set; }\n"
 
         create_joining_table(project_name, joining_table, model1, model2)
