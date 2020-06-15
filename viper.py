@@ -1,5 +1,7 @@
 import os
 import pathlib
+import fileinput
+import sys
 
 def candy():
     header = [
@@ -233,56 +235,61 @@ def build_models(project_name):
                 break
 
         # One-To-Many
-        while True:
-            res = input(f'\033[92m{"Y/n - Would you like to add a one-to-many relationship to this model? "}\033[00m')
-            if is_yes(res):
-                side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
-                # model on the Many side
-                if is_yes(side):
-                    while True:
-                        one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
-                        message = f"Y/n - You entered: {one} as the model on the one side of the relationship. Is this correct? "
-                        res = input(f'\033[92m{message}\033[00m')
-                        if res:
-                            break
-                    # model needs foregin key and nav property:
-                    attributes.append(f"{one}Id")
-                    display = ""
-                    while True:
-                        # change_display = input("Y/n - Would you like to change the default display? ")
-                        change_display = input(f'\033[92m{"Y/n - Would you like to change the default display of the foreign key field? "}\033[00m')
-                        if is_yes(change_display):
-                            # d = input("Enter custom display message: ")
-                            d = input(f'\033[92m{"Enter custom display message: "}\033[00m')
-                            # r = input(f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? ")
-                            message = f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? "
-                            r = input(f'\033[92m{message}\033[00m')
-                            if is_yes(r):
-                                display = d
-                                break
-                        else:
-                            break
-                    if display != "":
-                        lines2.append(f'        [Display(Name = "{display}")]')
-                    lines2.append(f"        public int {one}Id " + "{ get; set; }")
-                    lines2.append(f"        public {one} {one}Creator " + "{ get; set; }")
-                    lines2.append("")
+        # while True:
+        #     res = input(f'\033[92m{"Y/n - Would you like to add a one-to-many relationship to this model? "}\033[00m')
+        #     if is_yes(res):
+        #         side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
+        #         # model on the Many side
+        #         if is_yes(side):
+        #             while True:
+        #                 one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
+        #                 message = f"Y/n - You entered: {one} as the model on the one side of the relationship. Is this correct? "
+        #                 res = input(f'\033[92m{message}\033[00m')
+        #                 if res:
+        #                     break
+        #             # model needs foregin key and nav property:
+        #             attributes.append(f"{one}Id")
+        #             display = ""
+        #             while True:
+        #                 # change_display = input("Y/n - Would you like to change the default display? ")
+        #                 change_display = input(f'\033[92m{"Y/n - Would you like to change the default display of the foreign key field? "}\033[00m')
+        #                 if is_yes(change_display):
+        #                     # d = input("Enter custom display message: ")
+        #                     d = input(f'\033[92m{"Enter custom display message: "}\033[00m')
+        #                     # r = input(f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? ")
+        #                     message = f"Y/n - You wrote -- {d} -- as your custom display message. Is this correct? "
+        #                     r = input(f'\033[92m{message}\033[00m')
+        #                     if is_yes(r):
+        #                         display = d
+        #                         break
+        #                 else:
+        #                     break
+        #             if display != "":
+        #                 lines2.append(f'        [Display(Name = "{display}")]')
+        #             lines2.append(f"        public int {one}Id " + "{ get; set; }")
+        #             lines2.append(f"        public {one} {one}Creator " + "{ get; set; }")
+        #             lines2.append("")
 
-                # model on the One side
-                else:
-                    while True:
-                        one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
-                        one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
-                        message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the relationship. Is this correct? "
-                        res = input(f'\033[92m{message}\033[00m')
-                        if res:
-                            break
-                    lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
-                    lines2.append("")
-            else:
-                break
+        #         # model on the One side
+        #         else:
+        #             while True:
+        #                 one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
+        #                 one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
+        #                 message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the relationship. Is this correct? "
+        #                 res = input(f'\033[92m{message}\033[00m')
+        #                 if res:
+        #                     break
+        #             lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
+        #             lines2.append("")
+        #     else:
+        #         break
         
         lines3 = [
+        "        // One-To-Many (One-side) nav property goes here <<\n",
+        "        // One-To-Many (Many-side) nav property goes here <<\n",
+        "",
+        "        // Many-To-Many nav property goes here <<",
+        "",
         "        [Required]",
         "        public DateTime CreatedAt { get; set; }",
         "",
@@ -854,38 +861,43 @@ def add_login_and_registration(project_name, context_name, extra_controller_line
         lines2 = []
 
         # One-To-Many
-        while True:
-            res = input(f'\033[92m{"Y/n - Would you like to add a one-to-many relationship to the Login/Registration User model? "}\033[00m')
-            if is_yes(res):
-                side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
-                # model on the Many side
-                if is_yes(side):
-                    while True:
-                        one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
-                        message = f"Y/n - You entered: {one} as the model on the one side of the relationship. Is this correct? "
-                        res = input(f'\033[92m{message}\033[00m')
-                        if res:
-                            break
-                    # model needs foregin key and nav property:
-                    lines2.append(f"        public int {one}Id " + "{ get; set; }")
-                    lines2.append(f"        public {one} Creator " + "{ get; set }")
-                    lines2.append("")
-                # model on the One side
-                else:
-                    while True:
-                        one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
-                        one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
-                        message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the relationship. Is this correct? "
-                        res = input(f'\033[92m{message}\033[00m')
-                        if res:
-                            break
-                    lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
-                    lines2.append("")
-            else:
-                break
+        # while True:
+        #     res = input(f'\033[92m{"Y/n - Would you like to add a one-to-many relationship to the Login/Registration User model? "}\033[00m')
+        #     if is_yes(res):
+        #         side = input(f'\033[92m{"Y/n - Is this model on the many side of the relationship? "}\033[00m')
+        #         # model on the Many side
+        #         if is_yes(side):
+        #             while True:
+        #                 one = input(f'\033[92m{"What is the name of the model on the one side of the relationship? "}\033[00m')
+        #                 message = f"Y/n - You entered: {one} as the model on the one side of the relationship. Is this correct? "
+        #                 res = input(f'\033[92m{message}\033[00m')
+        #                 if res:
+        #                     break
+        #             # model needs foregin key and nav property:
+        #             lines2.append(f"        public int {one}Id " + "{ get; set; }")
+        #             lines2.append(f"        public {one} Creator " + "{ get; set }")
+        #             lines2.append("")
+        #         # model on the One side
+        #         else:
+        #             while True:
+        #                 one_s = input(f'\033[92m{"What is the singular name of the model on the many side of the relationship? "}\033[00m')
+        #                 one_p = input(f'\033[92m{"What is the plural name of the model on the many side of the relationship? "}\033[00m')
+        #                 message = f"Y/n - You entered: {one_s}/{one_p} as the model on the one many of the relationship. Is this correct? "
+        #                 res = input(f'\033[92m{message}\033[00m')
+        #                 if res:
+        #                     break
+        #             lines2.append(f"        public List<{one_s}> Created{one_p} " + "{ get; set; }")
+        #             lines2.append("")
+        #     else:
+        #         break
 
 
         lines3 = [
+            "        // One-To-Many (One-side) nav property goes here <<\n",
+            "        // One-To-Many (Many-side) nav property goes here <<\n",
+            "",
+            "        // Many-To-Many nav property goes here <<",
+            "",
             "        public DateTime CreatedAt { get; set; } = DateTime.Now;",
             "",
             "        public DateTime UpdatedAt { get; set; } = DateTime.Now;",
@@ -1216,6 +1228,151 @@ def add_login_and_registration(project_name, context_name, extra_controller_line
     # customize_css(project_name)
     build_success()
 
+def map_database_relationships(project_name, models):
+
+    display_models = [model[0] for model in models]
+
+    def is_yes(res):
+        return res.lower() in ["y", "yes"]    
+
+    def create_joining_table(project_name, joining_table_name, model1, model2):
+        lines = [
+            "using System;",
+            "using System.Collections.Generic;",
+            "using System.ComponentModel.DataAnnotations;",
+            "",
+            f"namespace {project_name}.Models",
+            "{",
+            f"    public class {joining_table_name}",
+            "    {",
+            "        [Key]",
+            f"        public int {joining_table_name}Id " +"{ get; set; }",
+            "",
+            f"        public int {model1}Id " + "{ get; set; }",
+            f"        public int {model2}Id " + "{ get; set; }",
+            f"        public {model1} {model1} " + "{ get; set; }",
+            f"        public {model2} {model2} " + "{ get; set; }",
+            "        [Required]",
+            "        public DateTime CreatedAt { get; set; }",
+            "",
+            "        [Required]",
+            "        public DateTime UpdatedAt { get; set; }",
+            "    }",
+            "}",
+            "",
+        ]
+        new_file_contents = ""
+        for line in lines:
+            new_file_contents += line + "\n"
+
+        os.system(f"touch ./{project_name}/Models/{joining_table_name}.cs")
+        os.system(f"cat > ./{project_name}/Models/{joining_table_name}.cs << EOF\n{new_file_contents}")
+    
+    def add_many_to_many_relationship(project_name, model1, model2, m1_nav_property, m2_nav_property):
+        search_exp = "        // Many-To-Many nav property goes here <<"
+
+        file1 = f"./{project_name}/Models/{model1}.cs"
+        file2 = f"./{project_name}/Models/{model2}.cs"
+        
+        # Update First Model
+        for line in fileinput.input(file1, inplace=1):
+            if search_exp in line:
+                line = line.replace(search_exp, f"{m1_nav_property}{search_exp}")
+            sys.stdout.write(line)
+
+        # Update Second Model
+        for line in fileinput.input(file2, inplace=1):
+            if search_exp in line:
+                line = line.replace(search_exp, f"{m2_nav_property}{search_exp}")
+            sys.stdout.write(line)
+
+    def add_one_to_many_relationship(project_name, one_model, many_model, model1_nav_property, model2_nav_property, model2_foreign_key):
+        model1_search_exp = "        // One-To-Many (One-side) nav property goes here <<\n"
+        model2_search_exp = "        // One-To-Many (Many-side) nav property goes here <<\n"
+
+        file1 = f"./{project_name}/Models/{one_model}.cs"
+        file2 = f"./{project_name}/Models/{many_model}.cs"
+
+        # Update One Model
+        for line in fileinput.input(file1, inplace=1):
+            if model1_search_exp in line:
+                line = line.replace(model1_search_exp, f"{model1_nav_property}{model1_search_exp}")
+            sys.stdout.write(line)
+
+        # Update Many Model
+        for line in fileinput.input(file2, inplace=1):
+            if model2_search_exp in line:
+                line = line.replace(model2_search_exp, f"{model2_foreign_key}{model2_nav_property}{model2_search_exp}")
+            sys.stdout.write(line)
+
+    # one-to-many
+    print("Let's configure your database relationships.")
+    while True:
+        wants_one_to_many = is_yes(input("Y/n - Would you like to add a one-to-many relationship between two models? "))
+        if not wants_one_to_many:
+            break
+        print(f"Your models include: {display_models}")
+        model1 = ""
+        model2 = ""
+        while True:
+            model1 = input("Please enter the name of the model on the one side of this relationship: ")
+            if model1 in display_models:
+                break
+            print("Oops, that model doesn't exist. ")
+        while True:
+            model2 = input("Please enter the name of the model on the many side of this relationship: ")
+            if model2 in display_models:
+                break
+            print("Oops, that model doesn't exist. ")
+        
+        # add navigation property to One Model
+        m1_nav_prop_label = input("What is the label of the 'One' model's navigation property? ")
+        m1_nav_property = f"        public List<{model2}> {m1_nav_prop_label} " + "{ get; set; }\n"
+
+        # add foreign key and navigation property to Many Model
+        m2_nav_prop_label = input("What is the label of the 'Many' model's navigation property? ")
+        m2_foreign_key = f"        public int {model1}Id " + "{ get; set; }\n"
+        m2_nav_property = f"        public {model1} {m2_nav_prop_label} " + "{ get; set; }\n"
+
+        res = input(f"Y/n - Add this relationship between {model1} and {model2}? ")
+        if not is_yes(res):
+            break
+        
+        # update files:
+        add_one_to_many_relationship(project_name, model1, model2, m1_nav_property, m2_nav_property, m2_foreign_key)
+        
+    # many-to-many
+    while True:
+        wants_many_to_many = is_yes(input("Y/n - Would you like to add a many-to-many relationship between two models? "))
+        if not wants_many_to_many:
+            break
+        print(f"Your models include: {display_models}")
+        model1 = ""
+        model2 = ""
+        while True:
+            model1 = input("Please enter the name of the first model: ")
+            if model1 in display_models:
+                break
+            print("Oops, that model doesn't exist. ")
+        while True:
+            model2 = input("Please enter the name of the second model: ")
+            if model2 in display_models:
+                break
+            print("Oops, that model doesn't exist. ")
+        
+        joining_table = input("What is the singular name of the joining table between these two models? ")
+        joining_table_plural = input("What is the plural name of the joining table between these two models? ")
+        models.append( (joining_table, joining_table_plural ))
+
+        m1_nav_prop_label = input("What is the label of the first model's navigation property? ")
+        m1_nav_property = f"        public List<{joining_table}> {m1_nav_prop_label} " + "{ get; set; }\n"
+
+        m2_nav_prop_label = input("What is the label of the second model's navigation property? ")
+        m2_nav_property = f"        public List<{joining_table}> {m2_nav_prop_label} " + "{ get; set; }\n"
+
+        create_joining_table(project_name, joining_table, model1, model2)
+        add_many_to_many_relationship(project_name, model1, model2, m1_nav_property, m2_nav_property)
+
 def customize_css(project_name):
     lines = [
     ".error-message{",
@@ -1288,6 +1445,8 @@ def viper():
         # run login_and_reg codes
         add_login_and_registration(project_name, context, controller_lines)
 
+    # Database relationships
+    map_database_relationships(project_name, models)
 
     # context = input("Enter name of context: ")
     build_context_file(project_name, context, models)
