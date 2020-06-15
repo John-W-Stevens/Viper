@@ -34,7 +34,6 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
         - EditBookForm.cshtml
     - Add fully functional CRUD methods to Home.Controller
     - Add a 'Books' link to the _Layout navbar
-
 - Provides an optional ready-made login and registration feature which has the following elements:
     - User.cs class (which will go into the database)
     - LoginUser.cs class (a viewModel class that won't go into the database)
@@ -42,6 +41,9 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
     - LoginPartial.cshtml (handles input validation and displays error messages)
     - Create(), Login(), Logout() methods added to Home.Controller
     - Passwords hashed and salted with Microsoft.AspNetCore.Identity
+- Provides optional database relational mapping
+    - Add one-to-many relationships between database tables
+    - Add many-to-many relationships between database tables
 - Optional ability to run migrations immediately
 - Launches project with dotnet watch run
 
