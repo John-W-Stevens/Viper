@@ -18,7 +18,7 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
     - add properties/attributes
     - add validations
     - configure display name)
-    - configure database relationships (currently, Viper only supports one-to-many relationships)
+    - configure database relationships (more on this below)
 - Provides optional ready-made CRUD functionality for each model. If selected, this option will do the following (I use a hypothetical "Book"
   model for this example):
     - Create the following routes (3x GET and 3x POST):
