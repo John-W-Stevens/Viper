@@ -1341,10 +1341,15 @@ def viper():
     print(f'\033[93m{"                 Welcome to Viper CLI. Lets build a project."}\033[00m')
     print()
 
-    project_name = input(f'\033[92m{"Enter project name: "}\033[00m')
-    MySql_Database = input(f'\033[92m{"Which MySql Database are you using? "}\033[00m')
-    MySql_Username = input(f'\033[92m{"Enter your MySql username: "}\033[00m')
-    MySql_Password = input(f'\033[92m{"Enter your MySql password: "}\033[00m')
+    while True:
+        project_name = input(f'\033[92m{"Enter project name: "}\033[00m')
+        MySql_Database = input(f'\033[92m{"Which MySql Database are you using? "}\033[00m')
+        MySql_Username = input(f'\033[92m{"Enter your MySql username: "}\033[00m')
+        MySql_Password = input(f'\033[92m{"Enter your MySql password: "}\033[00m')
+        message = f"Y/n - Start a project named {project_name} with the following MySQL credentials: Database: {MySql_Database}, Username: {MySql_Username}, Password: {MySql_Password}? "
+        is_correct = input(f'\033[92m{message}\033[00m')
+        if is_correct.lower() in ["y", "yes"]:
+            break
 
     global_json() # Create global.json file to specifiy using sdk 2.2.107
     os.system(f"dotnet new mvc --no-https -o {project_name}")
