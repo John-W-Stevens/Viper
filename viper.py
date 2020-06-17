@@ -40,8 +40,7 @@ def appsettings_json(project_name, database, username, password):
     )
 
 def global_json():
-    os.system("touch global.json")
-    os.system("cat >> ./global.json << EOF\n"
+    os.system("cat > ./global.json << EOF\n"
         '{\n'
         '    "sdk": {\n'
         '        "version": "2.2.107"\n'
@@ -52,7 +51,7 @@ def global_json():
 def gitignore(project_name):
     os.system(f"touch ./{project_name}/.gitignore")
     os.system(f"cat >> ./{project_name}/.gitignore << EOF\n"
-              "appsettings.json")
+        "appsettings.json")
 
 def build_startup_file(project_name, context_name):    
     lines = [
