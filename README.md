@@ -17,22 +17,22 @@ Viper allows you to quickly launch an ASP.NET Core MVC, no-https, web applicatio
 - Creates multiple models/schemas, based on user input, with customizable fields:
     - add properties/attributes
     - add validations
-    - configure display name)
+    - configure display name
     - configure database relationships (more on this below)
 - Provides optional ready-made CRUD functionality for each model. If selected, this option will do the following (I use a hypothetical "Book"
   model for this example):
     - Create the following routes (3x GET and 3x POST):
-        - HttpGet("/books")               -> Returns Books.cshtml (Displays a table of all books in the database)
-        - HttpGet("/book/bookId")         -> Returns a Read/Update/Delete page for One Single Book
-        - HttpGet("/book/create")         -> Returns CreateBookForm.cshtml
-        - HttpPost("/book/create")        -> Submits a Create Book request
-        - HttpPost("/book/bookId")        -> Submits a Book Update request
-        - HttpPost("/book/bookId/delete") -> Submits a Book Deletion request
-    - Create the following 3x Razor pages in /Home/Views/
+        - HttpGet("/books")                 -> Returns Books.cshtml (Displays a table of all books in the database)
+        - HttpGet("/book/create")           -> Returns CreateOrUpdateBook.cshtml
+        - HttpPost("/book/create")          -> Submits a Create Book request
+        - HttpGet("/book/{bookId}")         -> Returns a Read/Update/Delete page for One Single Book
+        - HttpPost("/book/{bookId}/update") -> Submits a Book Update request
+        - HttpPost("/book/{bookId}/delete") -> Submits a Book Deletion request
+    - Create a ./Views/Book directory add the following 3x Razor pages to it:
         - Books.cshtml
-        - CreateBookForm.cshtml
-        - EditBookForm.cshtml
-    - Add fully functional CRUD methods to Home.Controller
+        - Book.cshtml
+        - CreateOrUpdateBook.cshtml
+    - Create a Book Controller and add fully-functional CRUD methods
     - Add a 'Books' link to the _Layout navbar
 - Provides an optional ready-made login and registration feature which has the following elements:
     - User.cs class (which will go into the database)

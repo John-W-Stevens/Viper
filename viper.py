@@ -535,7 +535,7 @@ def CRUD(project_name, schema_s, schema_p, attributes, context_name):
             "using Microsoft.EntityFrameworkCore;",
             "using Microsoft.AspNetCore.Http;",
             "using Microsoft.AspNetCore.Identity;",
-            "using TestProject.Models;",
+            f"using {project_name}.Models;",
             "",
             f"namespace {project_name}.Controllers",
             "{",
@@ -1650,14 +1650,16 @@ def map_database_relationships(project_name, models):
         model2 = ""
         while True:
             # model1 = input("Please enter the name of the model on the one side of this relationship: ")
-            model1 = input(f'\033[92m{"Please enter the name of the model on the one side of this relationship: "}\033[00m')
+            message = "Please enter the name of the model on the 'One' side of this relationship: "
+            model1 = input(f'\033[92m{message}\033[00m')
             if model1 in display_models:
                 break
             # print("Oops, that model doesn't exist. ")
             print(f'\033[92m{error_message}\033[00m')
         while True:
             # model2 = input("Please enter the name of the model on the many side of this relationship: ")
-            model2 = input(f'\033[92m{"Please enter the name of the model on the many side of this relationship: "}\033[00m')
+            message = "Please enter the name of the model on the 'Many' side of this relationship: "
+            model2 = input(f'\033[92m{message}\033[00m')
             if model2 in display_models:
                 break
             # print("Oops, that model doesn't exist. ")
@@ -1712,20 +1714,22 @@ def map_database_relationships(project_name, models):
             print(f'\033[92m{error_message}\033[00m')
         
         # joining_table = input("What is the singular name of the joining table between these two models? ")
-        joining_table = input(f'\033[92m{"What is the singular name of the joining table between these two models? "}\033[00m')
+        message = f"What is the singular name of the joining table between {model1} and {model2}? "
+        joining_table = input(f'\033[92m{message}\033[00m')
 
         # joining_table_plural = input("What is the plural name of the joining table between these two models? ")
-        joining_table_plural = input(f'\033[92m{"What is the plural name of the joining table between these two models? "}\033[00m')
+        message = f"What is the plural name of the joining table between {model1} and {model2}? "
+        joining_table_plural = input(f'\033[92m{message}\033[00m')
 
         models.append( (joining_table, joining_table_plural ))
 
         # m1_nav_prop_label = input("What is the label of the first model's navigation property? ")
-        message = "What is the label of the first model's navigation property? "
+        message = f"What is the label of {model1}'s navigation property? "
         m1_nav_prop_label = input(f'\033[92m{message}\033[00m')
         m1_nav_property = f"        public List<{joining_table}> {m1_nav_prop_label} " + "{ get; set; }\n"
 
         # m2_nav_prop_label = input("What is the label of the second model's navigation property? ")
-        message = "What is the label of the second model's navigation property? "
+        message = f"What is the label of {model2}'s navigation property? "
         m2_nav_prop_label = input(f'\033[92m{message}\033[00m')
         m2_nav_property = f"        public List<{joining_table}> {m2_nav_prop_label} " + "{ get; set; }\n"
 
@@ -1805,7 +1809,8 @@ def viper():
         add_login_and_registration(project_name, context, controller_lines)
 
     # Database relationships
-    map_database_relationships(project_name, models)
+    if len(models) > 1:
+        map_database_relationships(project_name, models)
 
     # context = input("Enter name of context: ")
     build_context_file(project_name, context, models)
