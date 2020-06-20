@@ -468,7 +468,7 @@ def build_models(project_name, context_name):
                 label = input(f'\033[92m{"What is this attribute called? "}\033[00m')
                 attributes.append(label)
                 stype = input(f'\033[92m{"What is this attributes type? "}\033[00m')
-                required = input(f'\033[92m{"Y/n - Is this attribute required? "}\033[00m')
+                required = is_yes(input(f'\033[92m{"Y/n - Is this attribute required? "}\033[00m'))
                 display = ""
                 while True:
                     change_display = input(f'\033[92m{"Y/n - Would you like to change the default display? "}\033[00m')
